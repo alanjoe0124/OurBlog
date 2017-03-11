@@ -1,15 +1,14 @@
 <?php
 require_once("../ClassLib/EditBlog.class.php");
+require_once("../ClassLib/MysqliExt.class.php");
+require_once("../ClassLib/Session.class.php");
 require_once("../config/config.php");
-$mysqli = new mysqli("$host", "$dbUser", "$dbPwd", "$db");
-if (mysqli_connect_errno())
-{
-    echo mysqli_connect_error();
-}
+$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
 $blogId = htmlentities(trim($_GET['blog']), ENT_COMPAT, 'UTF-8');
-$editBlog = new EditBlog($blogId, $mysqli);
-$cookieEmail = $editBlog->user_cookie_check();
-$editBlog->get_user_id($cookieEmail);
+$editBlog = new EditBlog($blogId, $mysqliExt);
+$session=new Session($mysqliExt);
+$sessionEmail = $session->user_session_check();
+$editBlog->get_user_id($sessionEmail);
 $authorityCheck = $editBlog->authority_check();
 if ($authorityCheck == 1)
 {

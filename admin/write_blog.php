@@ -1,14 +1,12 @@
 <?php
 require_once("../ClassLib/WriteBlog.class.php");
+require_once("../ClassLib/MysqliExt.class.php");
+require_once("../ClassLib/Session.class.php");
 require_once("../config/config.php");
-$mysqli=new mysqli("$host", "$dbUser", "$dbPwd", "$db");
-if(mysqli_connect_errno())
-{
-    echo mysqli_connect_error();
-}
-
-$writeBlog = new WriteBlog($mysqli);
-$cookieEmail=$writeBlog->user_cookie_check();
+$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
+$writeBlog = new WriteBlog($mysqliExt);
+$session=new Session($mysqliExt);
+$sessionEmail = $session->user_session_check();
 $arrList=$writeBlog->list_idx_columns();
 
 ?>
@@ -39,7 +37,7 @@ $arrList=$writeBlog->list_idx_columns();
                     <div class="row-title">
                         column:
                         <select name="column">
-                            <option value="0" selected="selected">column</option>
+                            <option value="0" selected="selected">select one please</option>
                             <?php 
                             foreach($arrList as $key=>$value){
                                  echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";  

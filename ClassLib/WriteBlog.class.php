@@ -1,69 +1,47 @@
 <?php
-class WriteBlog{
-    private $mysqli;
+
+class WriteBlog {
+
+    private $mysqliExt;
     private $userId;
-    
-    public function __construct($mysqli)
+
+    public function __construct($mysqliExt)
     {
-        $this->mysqli = $mysqli;
+        $this->mysqliExt = $mysqliExt;
     }
-    public function __destruct()
+
+    public function post_blog($indexColumnId, $title, $content)
     {
-        $mysqli=$this->mysqli;
-        $mysqli->close();
+        $mysqliExt = $this->mysqliExt;
+        $userId = $this->userId;
+        $postTime = date("Y-m-d h:i:s");
+        $sqt = "insert into blog set idx_column_id=?, title= ?,content=?,user_id=?,post_time=?";
+        $para = array('issis', &$indexColumnId, &$title, &$content, &$userId, &$postTime);
+        $mysqliExt->insert_execute($sqt, $para);
+        header("Location:http://" . $_SERVER['SERVER_NAME'] . "/OurBlog/admin/write_blog.php");
     }
-    
-    public function post_blog($indexColumnId,$title,$content){
-            $mysqli=$this->mysqli;
-            $userId=$this->userId;
-            $postTime=date("Y-m-d h:i:s");
-            $sqt = "insert into blog set idx_column_id=?, title= ?,content=?,user_id=?,post_time=?";
-            $stmt = $mysqli->prepare($sqt);
-            $stmt->bind_param('issis', $indexColumnId,$title,$content,$userId,$postTime);
-            $stmt->execute();
-            $stmt->close();
-            header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/write_blog.php");
-    }
-    
-    public function list_idx_columns(){
-        $mysqli=$this->mysqli;
+
+    public function list_idx_columns()
+    {
+        $mysqliExt = $this->mysqliExt;
         $sql = "select * from index_column";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $data = $mysqliExt->select_execute($sql);
         return $data;
     }
-    
-    public function user_cookie_check(){
-        $cookieEmail=$_COOKIE['userEmail'];
-        if(empty($cookieEmail)){
-           exit("sorry, login please!"); 
-        }else{
-            return $cookieEmail;
-        }
-    }
-    
+
     public function get_user_id($email)
     {
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         $sql = "select id from user where email=?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $para = array('s', &$email);
+        $data = $mysqliExt->select_execute($sql, $para);
         foreach ($data as $value)
         {
             $return = $value['id'];
         }
         $this->userId = $return;
     }
-    
+
 }
 ?>
 

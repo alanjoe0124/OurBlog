@@ -1,20 +1,19 @@
 <?php
 require_once("../ClassLib/Login.class.php");
 require_once("../config/config.php");
+require_once("../ClassLib/MysqliExt.class.php");
+require_once("../ClassLib/Session.class.php");
 $email = htmlentities(trim($_POST['email']),ENT_COMPAT,'UTF-8');
 $strPwd= htmlentities(trim($_POST['pwd']),ENT_COMPAT,'UTF-8');
 $salt="secret";
 $strPwd.=$salt;
 $pwd = md5($strPwd); 
-$mysqli=new mysqli("$host", "$dbUser", "$dbPwd", "$db");
-if(mysqli_connect_errno())
-{
-    echo mysqli_connect_error();
-}
+$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
 if (!empty($email) && !empty($pwd))
 {
-    $login = new Login($email, $pwd,$mysqli);
-    $login->handle();
+    $login = new Login($email, $pwd,$mysqliExt);
+    $session=new Session($mysqliExt); 
+    $login->handle($session);
 }
 else
 {

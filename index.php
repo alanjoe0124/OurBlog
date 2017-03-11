@@ -1,13 +1,12 @@
 <?php 
+require_once("./ClassLib/MysqliExt.class.php");
 require_once("./ClassLib/Index.class.php");
+require_once("./ClassLib/Session.class.php");
 require_once("./config/config.php");
-$mysqli = new mysqli("$host", "$dbUser", "$dbPwd", "$db");
-if (mysqli_connect_errno())
-{
-    echo mysqli_connect_error();
-}
-$index = new Index($mysqli);
-$cookieEmail = $index->user_cookie_check();
+$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
+$index = new Index($mysqliExt);
+$session=new Session($mysqliExt);
+$sessionEmail = $session->user_session_check(1);
 $col=htmlentities(trim($_GET['col']), ENT_COMPAT, 'UTF-8');
 $listColumns = $index->list_columns();
 $listBlogs = $index->list_blogs($col);
@@ -24,7 +23,7 @@ $listBlogs = $index->list_blogs($col);
                 <div class="head-main-box">
                     <p><h1><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/index.php">OurBlog</a></h1>
                     <?php
-                        if($cookieEmail==NULL){
+                        if($sessionEmail==NULL){
                             echo "&nbsp;<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/login.php\">login</a></h4>
                                   |<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/register.php\">register</a></h4>";
                         }else{

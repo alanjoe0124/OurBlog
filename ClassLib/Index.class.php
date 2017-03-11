@@ -1,54 +1,31 @@
 <?php
 class Index{
-    private $mysqli;
+    private $mysqliExt;
     
-    public function __construct($mysqli)
+    public function __construct($mysqliExt)
     {
-        $this->mysqli=$mysqli;
-    }
-    
-    public function __destruct()
-    {
-        $mysqli = $this->mysqli;
-        $mysqli->close();
+        $this->mysqliExt=$mysqliExt;
     }
     
     public function list_columns(){
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         $sql = "select * from index_column";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $data=$mysqliExt->select_execute($sql);
         return $data;
     }
     
     public function list_blogs($col=NULL){
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         if($col==NULL){
           $sql = "select * from blog";
-          $stmt = $mysqli->prepare($sql);
         }else{
           $sql = "select * from blog where idx_column_id=?";
-          $stmt = $mysqli->prepare($sql);
-          $stmt->bind_param('i', $col);
-        }     
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+          $para=array('i',&$col);
+        }
+        $data=$mysqliExt->select_execute($sql,$para);
         return $data;
     }
-    
-        
-    public function user_cookie_check(){
-        $cookieEmail=$_COOKIE['userEmail'];
-         return $cookieEmail;
-      
-    }
+          
     
 }
 ?>

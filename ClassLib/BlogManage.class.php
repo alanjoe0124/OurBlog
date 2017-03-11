@@ -2,18 +2,12 @@
 
 class BlogManage {
 
-    private $mysqli;
+    private $mysqliExt;
     private $userId;
 
-    public function __construct($mysqli)
+    public function __construct($mysqliExt)
     {
-        $this->mysqli = $mysqli;
-    }
-
-    public function __destruct()
-    {
-        $mysqli = $this->mysqli;
-        $mysqli->close();
+        $this->mysqliExt = $mysqliExt;
     }
 
     public function action_judge($action, $blogId)
@@ -40,15 +34,10 @@ class BlogManage {
     public function authority_check($blogId)
     {
         $userId = $this->userId;
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         $sql = "select user_id from blog where id=?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('i', $blogId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);;
-        $stmt->free_result();
-        $stmt->close();
+        $para=array('i',&$blogId);
+        $data=$mysqliExt->select_execute($sql,$para);
         if ($data != NULL)
         {
             foreach ($data as $key => $value)
@@ -72,26 +61,19 @@ class BlogManage {
     public function list_user_blog()
     {
         $userId = $this->userId;
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         $sql = "select * from blog where user_id=?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('i', $userId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $para=array('i',&$userId);
+        $data=$mysqliExt->select_execute($sql,$para);
         return $data;
     }
 
     public function delete_blog($blogId)
     {
-        $mysqli = $this->mysqli;
-        $sql = "delete  from blog where id=?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('i', $blogId);
-        $stmt->execute();
-        $stmt->close();
+        $mysqliExt = $this->mysqliExt;
+        $sql = "delete from blog where id=?";
+        $para=array('i',&$blogId);
+        $mysqliExt->delete_execute($sql,$para);
     }
 
     public function edit_blog($blogId)
@@ -99,30 +81,12 @@ class BlogManage {
         header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/edit_blog.php?blog={$blogId}"); 
     }
 
-    public function user_cookie_check()
-    {
-        $cookieEmail = $_COOKIE['userEmail'];
-        if (empty($cookieEmail))
-        {
-            exit("sorry, login please!");
-        }
-        else
-        {
-            return $cookieEmail;
-        }
-    }
-
     public function get_user_id($email)
     {
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         $sql = "select id from user where email=?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $para=array('s',&$email);
+        $data=$mysqliExt->select_execute($sql,$para);
         foreach ($data as $value)
         {
             $return = $value['id'];
@@ -131,7 +95,12 @@ class BlogManage {
     }
     
     public function logout(){
-        setcookie("userEmail", "",time()-3600,"/OurBlog");
+        session_start();
+        $email=$_SESSION['userEmail'];
+        unset($_SESSION['userEmail']);
+        $mysqliExt=$this->mysqliExt;
+        $sql="update user set session_validate=NULL where email=\"".$email."\"";
+        $mysqliExt->update_execute($sql);
         header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/index.php"); 
     }
 

@@ -4,65 +4,66 @@ class Login {
 
     private $email;
     private $pwd;
-    private $mysqli;
+    private $mysqliExt;
 
-    public function __construct($email, $pwd, $mysqli)
+    public function __construct($email, $pwd, $mysqliExt)
     {
         $this->email = $email;
         $this->pwd = $pwd;
-        $this->mysqli = $mysqli;
+        $this->mysqliExt = $mysqliExt;
     }
-    public function __destruct()
-    {
-        $mysqli=$this->mysqli;
-        $mysqli->close();
-    }
-    public function handle()
+
+    public function handle($session)
     {
         $email = $this->email;
         $pwd = $this->pwd;
-        $mysqli=$this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         // check if exist
         $sql = "select count(*) from user where email = ?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_assoc();
-        $num=$data['count(*)'];
-        $stmt->free_result();
-        $stmt->close();
-        if($num == 1){
+        $para = array("s", &$email);
+        $num = $mysqliExt->count($sql, $para);
+        if ($num == 1)
+        {
             //check pwd 
-            $sql="select pwd from user where email=?";
-            $stmt = $mysqli->prepare($sql);
-            $stmt->bind_param('s', $email);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            $data = $result->fetch_assoc();
-            $emailPwd=$data['pwd'];
-            $stmt->free_result();
-            $stmt->close();
-            if($pwd==$emailPwd){
-                $this->cookie_set($email);
-                header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/blog_manage.php");  
-            }else{
+            $mysqliExt->startTrans();
+            $sqd = "select pwd,session_validate from user where email=? for update";
+            $data = $mysqliExt->select_execute($sqd, $para);
+            foreach ($data as $res)
+            {
+                $emailPwd = $res['pwd'];
+                $sessionValidate=$res['session_validate'];
+            }
+            if ($pwd == $emailPwd && $sessionValidate==NULL)
+            {
+                $updateAffectedRow=$session->session_set($email);
+                $flag=true;
+                if($updateAffectedRow==0){
+                    $flag = false;   
+                }
+                if($flag) { 
+                    $mysqliExt->commit();
+                } else { 
+                    $mysqliExt->rollback(); 
+                } 
+                    $mysqliExt->endTrans();
+                header("Location:http://" . $_SERVER['SERVER_NAME'] . "/OurBlog/admin/blog_manage.php");
+            }
+            else if($pwd != $emailPwd)
+            {
                 exit("password wrong!");
             }
-        }else{
-            
+            else if($sessionValidate!=NULL){
+                exit('account has been logged in by other, if that is not your operation, please contact to administator and change your pwd asap!');
+            }
+            else{
+                
+            }
+        }
+        else
+        {
             exit("email doesn't exist!");
-        }   
+        }
     }
-
-    public function cookie_set($email)
-    {
-        $name="userEmail";
-        $value=$email;
-        $expire=time()+10800;
-        setcookie($name, $value, $expire,"/OurBlog");
-    }
-
 
 }
 

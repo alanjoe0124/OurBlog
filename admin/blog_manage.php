@@ -1,16 +1,13 @@
 <?php
 require_once("../ClassLib/BlogManage.class.php");
+require_once("../ClassLib/Session.class.php");
 require_once("../config/config.php");
-
-$mysqli = new mysqli("$host", "$dbUser", "$dbPwd", "$db");
-if (mysqli_connect_errno())
-{
-    echo mysqli_connect_error();
-}
-
-$blogManage = new BlogManage($mysqli);
-$cookieEmail = $blogManage->user_cookie_check();
-$blogManage->get_user_id($cookieEmail);
+require_once("../ClassLib/MysqliExt.class.php");
+$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
+$blogManage = new BlogManage($mysqliExt);
+$session=new Session($mysqliExt);
+$sessionEmail = $session->user_session_check();
+$blogManage->get_user_id($sessionEmail);
 $res = $blogManage->list_user_blog();
 ?>
 <html>
@@ -30,7 +27,7 @@ $res = $blogManage->list_user_blog();
                     &nbsp;&nbsp;
                     <h4><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/write_blog.php">blog write</a></h4>
                     </p>
-                    <h4><?php echo $cookieEmail; ?>|<a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/blog_manage_handle.php?action=logout">logout</a></h4>
+                    <h4><?php echo $sessionEmail; ?>|<a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/blog_manage_handle.php?action=logout">logout</a></h4>
                    
                     <HR width="100%">
                 </div>

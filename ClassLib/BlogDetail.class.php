@@ -1,43 +1,29 @@
 <?php
 class BlogDetail{
     private $blogId;
-    private $mysqli;
+    private $mysqliExt;
     
-    public function __construct($blog,$mysqli)
+    public function __construct($blog,$mysqliExt)
     {
         $this->blogId=$blog;
-        $this->mysqli=$mysqli;
+        $this->mysqliExt=$mysqliExt;
     }
     
     public function list_columns(){
-        $mysqli = $this->mysqli;
+        $mysqliExt = $this->mysqliExt;
         $sql = "select * from index_column";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $data=$mysqliExt->select_execute($sql);
         return $data;
     }
     
     public function list_blog_detail(){
         $blogId=$this->blogId;
-        $mysqli = $this->mysqli; 
+        $mysqliExt = $this->mysqliExt; 
         $sql = "select * from blog where id=?";
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('i', $blogId);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $data = $result->fetch_all(MYSQLI_ASSOC);
-        $stmt->free_result();
-        $stmt->close();
+        $para=array('i',&$blogId);
+        $data=$mysqliExt->select_execute($sql,$para);
         return $data;
     }
     
-    public function user_cookie_check(){
-        $cookieEmail=$_COOKIE['userEmail'];
-          return $cookieEmail;
-    }
 }
 ?>
