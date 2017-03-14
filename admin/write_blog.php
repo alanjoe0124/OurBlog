@@ -1,8 +1,6 @@
 <?php
-require_once("../ClassLib/WriteBlog.class.php");
-require_once("../ClassLib/MysqliExt.class.php");
-require_once("../ClassLib/Session.class.php");
 require_once("../config/config.php");
+require_once("../ClassLib/AutoLoad.php");
 $mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
 $writeBlog = new WriteBlog($mysqliExt);
 $session=new Session($mysqliExt);

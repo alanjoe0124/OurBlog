@@ -1,8 +1,6 @@
 <?php 
-require_once("./ClassLib/BlogDetail.class.php");
-require_once("./ClassLib/MysqliExt.class.php");
-require_once("./ClassLib/Session.class.php");
 require_once("./config/config.php");
+require_once("./ClassLib/AutoLoad.php");
 $mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
 $blogId = htmlentities(trim($_GET['blog']), ENT_COMPAT, 'UTF-8');
 $blogDetail = new BlogDetail($blogId,$mysqliExt);

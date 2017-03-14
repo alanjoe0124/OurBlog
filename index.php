@@ -1,8 +1,6 @@
 <?php 
-require_once("./ClassLib/MysqliExt.class.php");
-require_once("./ClassLib/Index.class.php");
-require_once("./ClassLib/Session.class.php");
 require_once("./config/config.php");
+require_once("./ClassLib/AutoLoad.php");
 $mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
 $index = new Index($mysqliExt);
 $session=new Session($mysqliExt);

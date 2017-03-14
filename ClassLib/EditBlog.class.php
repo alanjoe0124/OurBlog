@@ -72,8 +72,6 @@ class EditBlog{
         $mysqliExt = $this->mysqliExt;
         $blogId=$this->blogId;
         $postTime=date("Y-m-d H:i:s");
-        // tansaction start
- 
         $sql = "update blog set idx_column_id=$idxColumnId,title=\"".$title."\",content=\"".$content."\",post_time=\"".$postTime."\" where id=$blogId";
         $mysqliExt->update_execute($sql);
         header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/blog_manage.php");

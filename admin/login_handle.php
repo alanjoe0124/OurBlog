@@ -1,8 +1,6 @@
 <?php
-require_once("../ClassLib/Login.class.php");
 require_once("../config/config.php");
-require_once("../ClassLib/MysqliExt.class.php");
-require_once("../ClassLib/Session.class.php");
+require_once("../ClassLib/AutoLoad.php");
 $email = htmlentities(trim($_POST['email']),ENT_COMPAT,'UTF-8');
 $strPwd= htmlentities(trim($_POST['pwd']),ENT_COMPAT,'UTF-8');
 $salt="secret";

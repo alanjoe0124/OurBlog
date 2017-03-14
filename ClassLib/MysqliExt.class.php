@@ -65,42 +65,5 @@ Class MysqliExt{
         $affectedCount=$mysqli->affected_rows;
         return $affectedCount;
     }
-    
-    public function startTrans(){
-        $mysqli=$this->mysqli;
-        $mysqli->autocommit(0);
-    }
-    public function endTrans(){
-        $mysqli=$this->mysqli;
-        $mysqli->autocommit(1);
-    }
-    
-    public function commit(){
-        $mysqli=$this->mysqli;
-        $mysqli->commit();
-    }
-    public function rollback(){
-        $mysqli=$this->mysqli;
-        $mysqli->rollback();
-    }
-   
-    /*
-    public function update_transaction($sql){
-        $mysqli=$this->mysqli;
-        $mysqli->autocommit(0);
-       *****  $flag = true;
-        $result=$mysqli->query($sql);
-        $affected_count = $mysqli->affected_rows; 
-        $flag = true;
-        if(!$result || $affected_count == 0) {  //update failed 
-            $flag = false;   
-        } 
-         if($flag) { 
-            $mysqli->commit();
-           } else { 
-            $mysqli->rollback(); 
-           } 
-        $mysqli->autocommit(1);
-    }
-    */
+
 }

@@ -1,9 +1,6 @@
 <?php
-require_once("../ClassLib/WriteBlog.class.php");
-require_once("../ClassLib/MysqliExt.class.php");
-require_once("../ClassLib/Session.class.php");
 require_once("../config/config.php");
-
+require_once("../ClassLib/AutoLoad.php");
 $indexColumnId=htmlentities(trim($_POST['column']), ENT_COMPAT, 'UTF-8');
 $title= htmlentities(trim($_POST['title']),ENT_COMPAT,'GB2312');
 $content= htmlentities(trim($_POST['content']),ENT_COMPAT,'GB2312');

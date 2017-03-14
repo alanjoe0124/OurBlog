@@ -96,11 +96,7 @@ class BlogManage {
     
     public function logout(){
         session_start();
-        $email=$_SESSION['userEmail'];
         unset($_SESSION['userEmail']);
-        $mysqliExt=$this->mysqliExt;
-        $sql="update user set session_validate=NULL where email=\"".$email."\"";
-        $mysqliExt->update_execute($sql);
         header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/index.php"); 
     }
 

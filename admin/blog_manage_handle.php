@@ -1,8 +1,6 @@
 <?php
-require_once("../ClassLib/BlogManage.class.php");
-require_once("../ClassLib/MysqliExt.class.php");
-require_once("../ClassLib/Session.class.php");
 require_once("../config/config.php");
+require_once("../ClassLib/AutoLoad.php");
 $action= htmlentities(trim($_GET['action']),ENT_COMPAT,'UTF-8');
 $blogId= htmlentities(trim($_GET['blog']),ENT_COMPAT,'UTF-8');
 

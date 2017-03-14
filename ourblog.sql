@@ -44,7 +44,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   `email` char(40) NOT NULL,
   `pwd` char(40) NOT NULL,
   `reg_time` datetime DEFAULT NULL,
-  `session_validate` char(40) NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=13 ;
 
