@@ -1,17 +1,19 @@
 
 <html>
     <head>
+        <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="../common/css/main.css">
-
+<!--
         <script type="text/javascript" src="../common/js/email_check.js"></script>
-    </head>
+-->
+</head>
     <body>
         <div class="container">
             <!--content_head start-->
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <p><h1><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/index.php">OurBlog</a>/register</h1>
+                    <p><h1><a href="/index.php">OurBlog</a>/register</h1>
                     <HR width="100%">
                 </div>
                 <div class="head-side-box"></div>
@@ -21,6 +23,13 @@
             <!--contetn_body start-->
             <div class="sidebox"></div>
             <div class="mainbox">
+                <?php
+                    if (isset($_GET['error'])) {
+                        if ($_GET['error'] == 'INVALID_PARAMS') {
+                            echo '<p style="color:red">参数不对</p>';
+                        }
+                    }
+                ?>
                 <form  method="post" action="register_handle.php">
 
                     <div class="row-title">
