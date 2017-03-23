@@ -4,36 +4,39 @@ class Register {
 
     private $email;
     private $pwd;
-    private $mysqliExt;
-
-    public function __construct($email, $pwd, $mysqliExt)
+    private $mysql;
+    
+    public function __construct($email, $pwd,$dbConf)
     {
         $this->email = $email;
         $this->pwd = $pwd;
-        $this->mysqliExt = $mysqliExt;
+        $this->mysql=Mysql::getInstance($dbConf);
     }
 
     public function handle($session)
     {
-        $email = $this->email;
-        $pwd = $this->pwd;
         $regTime=date("Y-m-d H:i:s");
-        $mysqliExt=$this->mysqliExt;
         // check if duplicate
-        $sql = "select count(*) from user where email = ?";
-        $para=array("s",&$email);
-        $num=$mysqliExt->count($sql,$para);
-        // insert into db
-        if($num == 0){
-            $sqt = "insert into user set email=?, pwd= ?,reg_time=?";
-            $param=array("sss",&$email,&$pwd,&$regTime);
-            $mysqliExt->insert_execute($sqt,$param);
-            $session->session_set($email);
-            header("Location:http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/blog_manage.php");
+        // $sql = "select * from user where email = :email";
+        $sql=$this->mysql->select("user",array('email'=>':email'));      
+        $arr['email']=$this->email;
+        $bindTypeArray['email']=PDO::PARAM_STR;
+        $data=$this->mysql->select_execute($sql,$arr,$bindTypeArray);
+        if($data==NULL){
+           $sql=$this->mysql->insert('user',array('email'=>':email','pwd'=>':pwd','reg_time'=>':reg_time'));
+            $arr['email']=$this->email;
+            $arr['pwd']=$this->pwd;
+            $arr['reg_time']=$regTime;
+            $bindTypeArray['email']=PDO::PARAM_STR;
+            $bindTypeArray['pwd']=PDO::PARAM_STR;
+            $bindTypeArray['reg_time']=PDO::PARAM_STR;
+            $this->mysql->insert_execute($sql,$arr,$bindTypeArray);           
+            $userDbId=$this->mysql->getLastInsertId();
+            $session->session_set($this->email,$userDbId);
         }else{
-            
             exit("email has been used!");
-        }   
+        }
+        
     }
 }
 

@@ -1,21 +1,29 @@
 <?php
 require_once("../config/config.php");
 require_once("../ClassLib/AutoLoad.php");
-$email = htmlentities(trim($_POST['email']),ENT_COMPAT,'UTF-8');
-$strPwd= htmlentities(trim($_POST['pwd']),ENT_COMPAT,'UTF-8');
+
+$email =filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
+$strPwd= $_POST['pwd'];
+
 $salt="secret";
 $strPwd.=$salt;
 $pwd = md5($strPwd); 
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
 
-if (!empty($email) && !empty($pwd))
+if ( $email && !empty($pwd))
 {
-    $register = new Register($email, $pwd,$mysqliExt);
-    $session=new Session($mysqliExt); 
+    if((strlen($email)+mb_strlen($email, 'UTF-8'))/2 >100 ){
+        exit("email\'s length should less than 100!");
+    }
+    $register = new Register($email, $pwd,$dbConf);
+    $session=new Session(); 
     $register->handle($session);
+    echo $_SESSION['uid']."<br>".$_SESSION['userEmail'];
+}
+elseif(!$email){
+    exit("email invalid!");
 }
 else
 {
-    echo "info not complete!";
+    exit("info not complete!");
 }
 ?>
