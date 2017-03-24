@@ -22,11 +22,11 @@
             <div class="sidebox"></div>
             <div class="mainbox">
                 <?php
-                    if (isset($_GET['error'])) {
-                        if ($_GET['error'] == 'INVALID_PARAMS') {
-                            echo '<p style="color:red">参数不对</p>';
-                        }
+                if (isset($_GET['error'])) {
+                    if ($_GET['error'] == 'password_failed') {
+                        echo '<p style="color:red">密码不对</p>';
                     }
+                }
                 ?>
                 <form  method="post" action="login_handle.php">
 
