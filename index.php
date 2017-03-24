@@ -1,12 +1,20 @@
-<?php 
-require_once("./config/config.php");
-require_once("./ClassLib/AutoLoad.php");
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
-$index = new Index($mysqliExt);
-$session=new Session($mysqliExt);
-$sessionEmail = $session->user_session_check(1);
-$col=htmlentities(trim($_GET['col']), ENT_COMPAT, 'UTF-8');
+<?php
+require_once __DIR__ . '/ClassLib/AutoLoad.php';
+$index = new Index();
 $listColumns = $index->list_columns();
+if (isset($_GET['col'])) {
+    $col = filter_var(
+            $_GET['col'], 
+            FILTER_VALIDATE_INT, 
+            array('options' =>
+                array('min_range' => 1,
+                      'max_range' => 255
+                     )
+            )
+    )?:NULL;
+} else {
+    $col = NULL;
+}
 $listBlogs = $index->list_blogs($col);
 ?>
 <html>
@@ -19,17 +27,21 @@ $listBlogs = $index->list_blogs($col);
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <p><h1><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/index.php">OurBlog</a></h1>
+                    <p><h1><a href="/index.php">OurBlog</a></h1>
                     <?php
-                        if($sessionEmail==NULL){
-                            echo "&nbsp;<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/login.php\">login</a></h4>
-                                  |<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/register.php\">register</a></h4>";
-                        }else{
-                             echo "&nbsp;&nbsp;<h1><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/blog_manage.php\">admin</a></h1>"; 
-                        }
-                        foreach($listColumns as $value){
-                            echo "&nbsp;<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/index.php?col={$value['id']}\">{$value['name']}</a></h4>";
-                        }
+                    $session = new Session();
+                    
+                    if (!$session->isLogin()) {
+                        echo '&nbsp;<h4><a href="/admin/login.php">login</a></h4>
+                                  |<h4><a href="/admin/register.php">register</a></h4>';
+                    } else {
+                        echo '&nbsp;&nbsp;<h1><a href="/admin/blog_manage.php">admin</a></h1>';
+                    }
+
+
+                    foreach ($listColumns as $value) {
+                        echo '&nbsp;<h4><a href="/index.php?col='.$value['id'].'">'.$value['name'].'</a></h4>';
+                    }
                     ?>
                     </p>
                     <HR width="100%">
@@ -41,23 +53,23 @@ $listBlogs = $index->list_blogs($col);
             <!--contetn_body start-->
             <div class="sidebox"></div>
             <div class="mainbox">
-                <?php 
-                    if($listBlogs!=NULL){
-                        foreach($listBlogs as $valBlg){
-                            echo " <div class=\"row-title\">
-                                        <div class=\"row-title-leftAlign\">
-                                            <a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/blog_detail.php?blog={$valBlg['id']}\">{$valBlg['title']}</a>
+                <?php
+                if ($listBlogs != NULL) {
+                    foreach ($listBlogs as $valBlg) {
+                        echo '<div class="row-title">
+                                        <div class="row-title-leftAlign">
+                                            <a href="/blog_detail.php?blog=' . $valBlg['id'] . '">' . htmlspecialchars_decode($valBlg['title']) . '</a>
                                         </div>
-                                    </div>";
-                        }
-                    }else{
-                        echo "nothing!";
+                                    </div>';
                     }
+                } else {
+                    echo "nothing!";
+                }
                 ?>
-                
+
             </div>
             <div class="sidebox"></div>
-             <!--contetn_body end-->
+            <!--contetn_body end-->
         </div>
     </body>
 </html>
