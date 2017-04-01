@@ -3,13 +3,11 @@
 class Login {
 
     public function handle($email, $pwd, $session) {
-        $sql = "SELECT * FROM user WHERE email = ? AND pwd = ?";
-        $data = Mysql::getInstance()->selectRow($sql, array($email, md5($pwd . Register::SALT)));
-        if ($data != NULL) {
+        $data = Mysql::getInstance()->selectRow("SELECT * FROM user WHERE email = ? AND pwd = ?",array(
+                 $email, md5($pwd . Register::SALT)));
+        if ($data) {
             $session->session_set($email, $data['id']);
-            return 1;
-        } else {
-            return 0;
+            return true;
         }
     }
 

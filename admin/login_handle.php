@@ -23,7 +23,7 @@ try {
     }
     $login = new Login();
     $res = $login->handle($email, $_POST['pwd'], new Session());
-    if ($res == 0) {
+    if (!$res) {
         header("Location:/admin/login.php?error=password_failed");
     } else {
         header("Location: /admin/blog_manage.php");
