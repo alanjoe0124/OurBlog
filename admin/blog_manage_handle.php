@@ -1,25 +1,37 @@
 <?php
-require_once("../config/config.php");
-require_once("../ClassLib/AutoLoad.php");
-$action= htmlentities(trim($_GET['action']),ENT_COMPAT,'UTF-8');
-$blogId= htmlentities(trim($_GET['blog']),ENT_COMPAT,'UTF-8');
 
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
-
-if (!empty($action) && !empty($blogId))
-{
-    $blogManage = new BlogManage($mysqliExt);
-    $session=new Session($mysqliExt);
-    $sessionEmail = $session->user_session_check();
-    $blogManage->get_user_id($sessionEmail); 
-    $blogManage->action_judge($action, $blogId);
-}
-elseif($aciton="logout"){
-    $blogManage = new BlogManage($mysqliExt);
-    $blogManage->logout();
-}
-else
-{
-    echo "info not complete!";
+require_once __DIR__ . '/../ClassLib/AutoLoad.php';
+try {
+    $session = new Session();
+    if (!($session->isLogin())) {
+        header('Location:/admin/login.php');
+    }
+    if (!isset($_GET['action'])) {
+        throw new InvalidArgumentException("UNDEFINED ACTION");
+    }
+    $action = array('logout', 'edit', 'del');
+    if (!in_array($_GET['action'], $action)) {
+        throw new InvalidArgumentException('ACTION FAILED');
+    }
+    if ($_GET['action'] == "logout") {
+        $blogManage = new BlogManage();
+        $blogManage->logout();
+        header("Location:/index.php");
+    }
+    if (!isset($_GET['blog'])) {
+        throw new InvalidArgumentException("Blog not select");
+    }
+    $blogId = filter_var($_GET['blog'], FILTER_VALIDATE_INT, array(
+        'options' => array('min_range' => 1, 'max_range' => 4294967295)
+    ));
+    if (!$blogId) {
+        throw new InvalidArgumentException('Invalid blog id');
+    }
+    $blogManage = new BlogManage();
+    $blogManage->action_judge($_GET['action'], $blogId);
+} catch (InvalidArgumentException $e) {
+    exit('INVALID PARAM');
+} catch (Exception $e) {
+    exit("SERVER ERROR");
 }
 ?>
