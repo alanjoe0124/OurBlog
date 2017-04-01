@@ -10,4 +10,10 @@ class Blog {
             exit("sorry, permission denied");
         }
     }
+    
+    public function list_idx_columns()
+    {
+        return Mysql::getInstance()->selectAll("select * from index_column");
+    }
+
 }

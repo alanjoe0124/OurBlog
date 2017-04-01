@@ -11,10 +11,6 @@ class EditBlog extends Blog {
             $_GET['blog']));
     }
 
-    public function list_idx_columns() {
-        return Mysql::getInstance()->selectAll("select * from index_column");
-    }
-
     public function update_blog($bind = array()) {
         date_default_timezone_set('Asia/Shanghai');
         Mysql::getInstance()->update("blog", $bind);
