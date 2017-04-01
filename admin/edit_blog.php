@@ -1,29 +1,31 @@
 <?php
-require_once("../config/config.php");
-require_once("../ClassLib/AutoLoad.php");
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
-$blogId = htmlentities(trim($_GET['blog']), ENT_COMPAT, 'UTF-8');
-$editBlog = new EditBlog($blogId, $mysqliExt);
-$session=new Session($mysqliExt);
-$sessionEmail = $session->user_session_check();
-$editBlog->get_user_id($sessionEmail);
-$authorityCheck = $editBlog->authority_check();
-if ($authorityCheck == 1)
-{
-    $idxColumnList = $editBlog->list_idx_columns();
-    $blogInfo = $editBlog->list_blog_info();
-    foreach ($blogInfo as $val_blog)
-    {
-        $idxColumnId = $val_blog['idx_column_id'];
-        $idxColumnName = $val_blog['name'];
-        $title = $val_blog['title'];
-        $content = $val_blog['content'];
+require_once __DIR__ . '/../ClassLib/AutoLoad.php';
+try {
+    $session = new Session();
+    if (!($session->isLogin())) {
+        header('Location:/admin/login.php');
     }
+    if (!isset($_GET['blog'])) {
+        throw new InvalidArgumentException("UNDEFINED BLOG");
+    }
+    $blogId = filter_var($_GET['blog'], FILTER_VALIDATE_INT, array(
+        'options' => array('min_range' => 1, 'max_range' => 4294967295)
+    ));
+    if (!$blogId) {
+        throw new InvalidArgumentException('Invalid blog id');
+    }
+    $editBlog = new EditBlog();
+    $editBlog->authority_check($blogId);
+} catch (InvalidArgumentException $e) {
+    exit("INVALID PARAM");
+} catch (Exception $e) {
+    exit("SERVER ERROR");
 }
 ?>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="../common/css/main.css">
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
     </head>
     <body>
         <div class="container">
@@ -31,9 +33,9 @@ if ($authorityCheck == 1)
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <p><h1><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/index.php">OurBlog</a>/edit_blog</h1>
-                    &nbsp;&nbsp;<h4><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/blog_manage.php">blog manage</a></h4>
-                    &nbsp;&nbsp;<h4><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/write_blog.php">blog write</a></h4></p>
+                    <p><h1><a href="/index.php">OurBlog</a>/edit_blog</h1>
+                    &nbsp;&nbsp;<h4><a href="/admin/blog_manage.php">blog manage</a></h4>
+                    &nbsp;&nbsp;<h4><a href="/admin/write_blog.php">blog write</a></h4></p>
                     <HR width="100%">
                 </div>
                 <div class="head-side-box"></div>
@@ -48,24 +50,25 @@ if ($authorityCheck == 1)
                     <div class="row-title">
                         column:
                         <select name="column">
-                            <option value="<?php echo $idxColumnId; ?>" selected="selected"><?php echo $idxColumnName ?></option>
+                            <?php $blogInfo = $editBlog->list_blog_info(); ?>
+                            <option value="<?php echo $blogInfo['idx_column_id']; ?>" selected="selected"><?php echo $blogInfo['name'] ?></option>
                             <?php
-                            foreach ($idxColumnList as $key => $value)
-                            {
-                                echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";
+                            $idxColumnList = $editBlog->list_idx_columns();
+                            foreach ($idxColumnList as $key => $value) {
+                                echo '<option value="'.$value['id'].'" > '.$value['name'].'</option>';
                             }
                             ?>
                         </select>
 
                     </div>
                     <div class="row-title">
-                        title:<input type="text"  id="title" name="title"  value="<?php echo $title; ?>" >
+                        title:<input type="text"  id="title" name="title"  value="<?php echo htmlspecialchars($blogInfo['title']); ?>" >
                     </div>
                     <div class="row-text">
-                        text:<textarea name="content" rows = "10"> <?php echo $content; ?></textarea>
+                        text:<textarea name="content" rows = "10"> <?php echo htmlspecialchars($blogInfo['content']); ?></textarea>
                     </div>
                     <div class="row-title">
-                        <input type="hidden" name='blog' value="<?php echo $blogId; ?>">
+                        <input type="hidden" name='blog' value="<?php echo $_GET['blog']; ?>">
                         <input type="submit" name='submit' value="submit">
                     </div>   
                 </form>

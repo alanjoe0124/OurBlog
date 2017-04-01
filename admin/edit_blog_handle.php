@@ -1,25 +1,55 @@
 <?php
-require_once("../config/config.php");
-require_once("../ClassLib/AutoLoad.php");
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
-$blogId = htmlentities(trim($_POST['blog']), ENT_COMPAT, 'UTF-8');
-$idxColumnId = htmlentities(trim($_POST['column']), ENT_COMPAT, 'UTF-8');
-$title = htmlentities(trim($_POST['title']), ENT_COMPAT, 'GB2312');
-$content = htmlentities(trim($_POST['content']), ENT_COMPAT, 'GB2312');
-
-if (!empty($title) && !empty($content) )
-{
-    $editBlog = new EditBlog($blogId, $mysqliExt);
-    $session=new Session($mysqliExt);
-    $sessionEmail = $session->user_session_check();
-    $editBlog->get_user_id($sessionEmail);
-    $authorityCheck = $editBlog->authority_check();
-    if ($authorityCheck == 1)
-    {
-        $editBlog->update_blog($idxColumnId,$title,$content);
+require_once __DIR__ . '/../ClassLib/AutoLoad.php';
+try{
+    $session=new Session();
+    if(!($session -> isLogin())){
+        header('Location:/admin/login.php');
     }
-}else{
-     echo "info not complete!";
+    if(!isset($_POST['blog'])){
+        throw New InvalidArgumentException('Undefined blog');
+    }
+    if(!isset($_POST['column'])){
+        throw New InvalidArgumentException('Undefined Column');
+    }
+    if(!isset($_POST['title'])){
+        throw New InvalidArgumentException('Undefined Title');
+    }
+    if(!isset($_POST['content'])){
+        throw New InvalidArgumentException('Undefined Content');
+    }
+    if( strlen($_POST['title']) > 100 ){
+        throw New InvalidArgumentException('Title maxLength 100');
+    }
+    if( strlen($_POST['content']) > 16777215 ){
+        throw New InvalidArgumentException('Content maxLength 16777215');
+    }
+    $blogId = filter_var($_POST['blog'],FILTER_VALIDATE_INT, array(
+        'options'=>array('min_range'=>1,'max_range'=>4294967295)));
+    if(!$blogId){
+        throw new InvalidArgumentException('Invalid blog id');
+    }
+    $idx_column_id = filter_var($_POST['column'], FILTER_VALIDATE_INT, array(
+        'options' => array('min_range' => 1,'max_range'=>255)));
+    if (!$idx_column_id) {
+        throw new InvalidArgumentException("invalid column");
+    }
+    $editBlog = new EditBlog();
+    $editBlog ->authority_check($blogId);
+    $editBlog ->update_blog(
+            array(
+                'idx_column_id'=>$idx_column_id,
+                'title'=>$_POST['title'],
+                'content'=>$_POST['content'],
+                'post_time'=>date("Y-m-d H:i:s"),
+                'id'=>$blogId
+                ));
+    
+}catch(InvalidArgumentException $e){
+    //echo $e->getMessage();
+    exit("INVALID PARAM");
+}catch(Exception $e){
+    //echo $e->getMessage();
+    exit("SERVER ERROR"); 
 }
 
 
