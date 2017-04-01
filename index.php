@@ -1,21 +1,5 @@
 <?php
 require_once __DIR__ . '/ClassLib/AutoLoad.php';
-$index = new Index();
-$listColumns = $index->list_columns();
-if (isset($_GET['col'])) {
-    $col = filter_var(
-            $_GET['col'], 
-            FILTER_VALIDATE_INT, 
-            array('options' =>
-                array('min_range' => 1,
-                      'max_range' => 255
-                     )
-            )
-    )?:NULL;
-} else {
-    $col = NULL;
-}
-$listBlogs = $index->list_blogs($col);
 ?>
 <html>
     <head>
@@ -30,17 +14,16 @@ $listBlogs = $index->list_blogs($col);
                     <p><h1><a href="/index.php">OurBlog</a></h1>
                     <?php
                     $session = new Session();
-                    
                     if (!$session->isLogin()) {
                         echo '&nbsp;<h4><a href="/admin/login.php">login</a></h4>
                                   |<h4><a href="/admin/register.php">register</a></h4>';
                     } else {
                         echo '&nbsp;&nbsp;<h1><a href="/admin/blog_manage.php">admin</a></h1>';
                     }
-
-
+                    $index = new Index();
+                    $listColumns = $index->list_columns();
                     foreach ($listColumns as $value) {
-                        echo '&nbsp;<h4><a href="/index.php?col='.$value['id'].'">'.$value['name'].'</a></h4>';
+                        echo '&nbsp;<h4><a href="/index.php?col=' . $value['id'] . '">' . $value['name'] . '</a></h4>';
                     }
                     ?>
                     </p>
@@ -54,11 +37,19 @@ $listBlogs = $index->list_blogs($col);
             <div class="sidebox"></div>
             <div class="mainbox">
                 <?php
+              
+                if (isset($_GET['col'])) {
+                    $col = filter_var($_GET['col'], FILTER_VALIDATE_INT, array(
+                        'options' => array('min_range' => 1, 'max_range' => 255)));
+                } else {
+                    $col = NULL;
+                }
+                $listBlogs = $index->list_blogs($col);
                 if ($listBlogs != NULL) {
                     foreach ($listBlogs as $valBlg) {
                         echo '<div class="row-title">
                                         <div class="row-title-leftAlign">
-                                            <a href="/blog_detail.php?blog=' . $valBlg['id'] . '">' . htmlspecialchars_decode($valBlg['title']) . '</a>
+                                            <a href="/blog_detail.php?blog=' . $valBlg['id'] . '">' . htmlspecialchars($valBlg['title']) . '</a>
                                         </div>
                                     </div>';
                     }
