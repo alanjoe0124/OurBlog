@@ -1,17 +1,11 @@
 <?php 
-require_once("./config/config.php");
-require_once("./ClassLib/AutoLoad.php");
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
-$blogId = htmlentities(trim($_GET['blog']), ENT_COMPAT, 'UTF-8');
-$blogDetail = new BlogDetail($blogId,$mysqliExt);
-$session=new Session($mysqliExt);
-$sessionEmail = $session->user_session_check(1);
-$listColumns = $blogDetail->list_columns();
-$listBlogDetail=$blogDetail->list_blog_detail();
+require_once __DIR__."/ClassLib/AutoLoad.php";
+
 ?>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="./common/css/main.css">
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
     </head>
     <body>
         <div class="container">
@@ -19,16 +13,19 @@ $listBlogDetail=$blogDetail->list_blog_detail();
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <p><h1><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/index.php">OurBlog</a></h1>
+                    <p><h1><a href="/index.php">OurBlog</a></h1>
                     <?php
-                        if($sessionEmail==NULL){
-                            echo "&nbsp;<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/login.php\">login</a></h4>
-                                   |<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/register.php\">register</a></h4>";
+                       $session = new Session();
+                        if (!$session->isLogin()) {
+                            echo '&nbsp;<h4><a href="/admin/login.php">login</a></h4>
+                                   |<h4><a href="/admin/register.php">register</a></h4>';
                         }else{
-                             echo "&nbsp;&nbsp;<h1><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/admin/blog_manage.php\">admin</a></h1>"; 
+                             echo '&nbsp;&nbsp;<h1><a href="/admin/blog_manage.php">admin</a></h1>'; 
                         }
+                        $blogDetail = new BlogDetail();
+                        $listColumns = $blogDetail->list_columns();
                         foreach($listColumns as $value){
-                            echo "&nbsp;<h4><a href=\"http://".$_SERVER['SERVER_NAME']."/OurBlog/index.php?col={$value['id']}\">{$value['name']}</a></h4>";
+                            echo '&nbsp;<h4><a href="index.php?col='.$value['id'].'">'.$value['name'].'</a></h4>';
                         }
                     ?>
                     </p>
@@ -42,8 +39,9 @@ $listBlogDetail=$blogDetail->list_blog_detail();
             <div class="sidebox"></div>
             <div class="mainbox">
                 <?php
+                    $listBlogDetail=$blogDetail->list_blog_detail();
                     foreach($listBlogDetail as $val){
-                        echo "<div class=\"row-title-leftAlign\"><h2>{$val['title']}</h2></div><div class=\"row-content\">{$val['content']}</div>";
+                        echo '<div class="row-title-leftAlign"><h2>'.htmlspecialchars($val['title']).'</h2></div><div class="row-content">'.htmlspecialchars($val['content']).'</div>';
                     }
                 ?>
                 
