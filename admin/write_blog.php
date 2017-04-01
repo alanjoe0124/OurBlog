@@ -1,16 +1,15 @@
 <?php
-require_once("../config/config.php");
-require_once("../ClassLib/AutoLoad.php");
-$mysqliExt = new MysqliExt($host, $dbUser, $dbPwd, $db);
-$writeBlog = new WriteBlog($mysqliExt);
-$session=new Session($mysqliExt);
-$sessionEmail = $session->user_session_check();
-$arrList=$writeBlog->list_idx_columns();
+require_once __DIR__."/../ClassLib/AutoLoad.php";
+$session=new Session();
+if(!$session->isLogin()){
+    header("Location:/admin/login.php");
+}
 
 ?>
 <html>
     <head>
-        <link rel="stylesheet" type="text/css" href="../common/css/main.css">
+        <meta charset="utf-8">
+        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
     </head>
     <body>
         <div class="container">
@@ -18,9 +17,13 @@ $arrList=$writeBlog->list_idx_columns();
             <div class="headbox">
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
-                    <p><h1><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/index.php">OurBlog</a>/write_blog</h1>
-                    &nbsp;&nbsp;<h4><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/blog_manage.php">blog manage</a></h4>
-                    &nbsp;&nbsp;<h4><a href="http://<?php echo $_SERVER['SERVER_NAME']; ?>/OurBlog/admin/write_blog.php">blog write</a></h4></p>
+                    <p>
+                    <?php 
+                    echo '<h1><a href="/index.php">OurBlog</a>/write_blog</h1>
+                    &nbsp;&nbsp;<h4><a href="/admin/blog_manage.php">blog manage</a></h4>
+                    &nbsp;&nbsp;<h4><a href="/admin/write_blog.php">blog write</a></h4>';
+                    ?>
+                    </p>
                     <HR width="100%">
                 </div>
                 <div class="head-side-box"></div>
@@ -36,7 +39,9 @@ $arrList=$writeBlog->list_idx_columns();
                         column:
                         <select name="column">
                             <option value="0" selected="selected">select one please</option>
-                            <?php 
+                            <?php
+                            $writeBlog = new WriteBlog();
+                            $arrList=$writeBlog->list_idx_columns();
                             foreach($arrList as $key=>$value){
                                  echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";  
                             }
