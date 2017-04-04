@@ -21,7 +21,7 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                         echo '&nbsp;&nbsp;<h1><a href="/admin/blog_manage.php">admin</a></h1>';
                     }
                     $index = new Index();
-                    $listColumns = $index->list_columns();
+                    $listColumns = $index->list_idx_columns();
                     foreach ($listColumns as $value) {
                         echo '&nbsp;<h4><a href="/index.php?col=' . $value['id'] . '">' . $value['name'] . '</a></h4>';
                     }

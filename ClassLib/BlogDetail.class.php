@@ -1,10 +1,6 @@
 <?php
 
-class BlogDetail {
-
-    public function list_columns() {
-        return Mysql::getInstance()->selectAll("select * from index_column");
-    }
+class BlogDetail extends Blog{
 
     public function list_blog_detail() {
         if(isset($_GET['blog'])){
