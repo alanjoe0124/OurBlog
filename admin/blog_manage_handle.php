@@ -28,7 +28,18 @@ try {
         throw new InvalidArgumentException('Invalid blog id');
     }
     $blogManage = new BlogManage();
-    $blogManage->action_judge($_GET['action'], $blogId);
+	$blogManage->authority_check($blogId);
+	switch ($_GET['action']) {
+            case "del":
+                $blogManage->delete_blog($blogId);
+                header("Location:/admin/blog_manage.php");
+                break;
+            case "edit":
+                $blogManage->edit_blog($blogId);
+                break;
+            default:
+                break;
+    }
 } catch (InvalidArgumentException $e) {
     exit('INVALID PARAM');
 } catch (Exception $e) {
