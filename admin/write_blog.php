@@ -1,10 +1,9 @@
 <?php
-require_once __DIR__."/../ClassLib/AutoLoad.php";
-$session=new Session();
-if(!$session->isLogin()){
+require_once __DIR__ . "/../ClassLib/AutoLoad.php";
+$session = new Session();
+if (!$session->isLogin()) {
     header("Location:/admin/login.php");
 }
-
 ?>
 <html>
     <head>
@@ -18,11 +17,11 @@ if(!$session->isLogin()){
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
                     <p>
-                    <?php 
-                    echo '<h1><a href="/index.php">OurBlog</a>/write_blog</h1>
+                        <?php
+                        echo '<h1><a href="/index.php">OurBlog</a>/write_blog</h1>
                     &nbsp;&nbsp;<h4><a href="/admin/blog_manage.php">blog manage</a></h4>
                     &nbsp;&nbsp;<h4><a href="/admin/write_blog.php">blog write</a></h4>';
-                    ?>
+                        ?>
                     </p>
                     <HR width="100%">
                 </div>
@@ -41,9 +40,9 @@ if(!$session->isLogin()){
                             <option value="0" selected="selected">select one please</option>
                             <?php
                             $writeBlog = new WriteBlog();
-                            $arrList=$writeBlog->list_idx_columns();
-                            foreach($arrList as $key=>$value){
-                                 echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";  
+                            $arrList = $writeBlog->list_idx_columns();
+                            foreach ($arrList as $key => $value) {
+                                echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";
                             }
                             ?>
                         </select>
@@ -54,6 +53,19 @@ if(!$session->isLogin()){
                     </div>
                     <div class="row-text">
                         text:<textarea name="content" rows = "10"  placeholder="text..."></textarea>
+                    </div>
+                    <div class="row-title">
+                        tag:
+                        <?php
+                        $sysTag = $writeBlog->list_sys_tag();
+                        foreach ($sysTag as $vl) {
+                            echo '<label><input name="sys_tag[]" type="checkbox" value="' . $vl['id'] . '"/>' . $vl['tag_name'] . "</label>";
+                        }
+                        ?>
+                    </div>
+                    <div class="row-tags">
+                        <p>custom tag:</p>
+                        <textarea name="custom_tags" rows = "7"  value="" placeholder="input your tags separated with space"></textarea>
                     </div>
                     <div class="row-title">
                         <input type="submit" name='submit' value="submit">
