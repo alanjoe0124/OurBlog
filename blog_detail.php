@@ -39,10 +39,27 @@ require_once __DIR__."/ClassLib/AutoLoad.php";
             <div class="sidebox"></div>
             <div class="mainbox">
                 <?php
-                    $listBlogDetail=$blogDetail->list_blog_detail();
-                    foreach($listBlogDetail as $val){
-                        echo '<div class="row-title-leftAlign"><h2>'.htmlspecialchars($val['title']).'</h2></div><div class="row-content">'.htmlspecialchars($val['content']).'</div>';
+                    $tagNameString="";
+                    foreach($blogDetail->list_blog_tag() as $va){
+                        $tagNameString .= '<a href="#">'.$va['tag_name'].'</a>&nbsp;&nbsp;';
                     }
+                    foreach($blogDetail->list_blog_detail() as $val){
+                        if(!empty($tagNameString)){
+                        echo '<div class="row-title-leftAlign"><h2>'
+                                .htmlspecialchars($val['title'])
+                                .'</h2>tags:<p>'
+                                .$tagNameString
+                                .'</p></div><div class="row-content">'
+                                .htmlspecialchars($val['content']).'</div>';
+                      }else{
+                        echo '<div class="row-title-leftAlign"><h2>'
+                                .htmlspecialchars($val['title'])
+                                .'</h2></div><div class="row-content">'
+                                .htmlspecialchars($val['content']).'</div>';  
+                      }
+                        
+                        }
+
                 ?>
                 
             </div>
