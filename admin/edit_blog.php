@@ -55,7 +55,7 @@ try {
                             <?php
                             $idxColumnList = $editBlog->list_idx_columns();
                             foreach ($idxColumnList as $key => $value) {
-                                echo '<option value="'.$value['id'].'" > '.$value['name'].'</option>';
+                                echo '<option value="' . $value['id'] . '" > ' . $value['name'] . '</option>';
                             }
                             ?>
                         </select>
@@ -66,6 +66,49 @@ try {
                     </div>
                     <div class="row-text">
                         text:<textarea name="content" rows = "10"> <?php echo htmlspecialchars($blogInfo['content']); ?></textarea>
+                    </div>
+                    recommend tag:
+                    <div class="row-title">
+                        <?php
+                        $sysTag = $editBlog->list_sys_tag();
+                        foreach ($sysTag as $value) {
+                            $sysTagArr[$value['id']] = $value['tag_name'];
+                        }
+                        if ($editBlog->return_blog_tag()) {
+
+                            foreach (($editBlog->return_blog_tag()) as $val) {
+                                $blogTagArr[] = $val['tag_name'];
+                            }
+
+                            foreach ($sysTagArr as $key => $vl) {
+                                if (in_array($vl, $blogTagArr)) {// if sys tag in blog tags, checked = true; else no checked                      
+                                    echo '<label><input name="sys_tag[]" checked="true"  type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
+                                } else {
+                                    echo '<label><input name="sys_tag[]" type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
+                                }
+                            }
+                        } else {
+                            foreach ($sysTagArr as $key => $vl) {
+                                echo '<label><input name="sys_tag[]" type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
+                            }
+                        }
+                        ?>
+                    </div>
+                    <p>custom tag:(input tags separated with space)</p>
+                    <div class="row-tags">
+                        <textarea name="custom_tags" rows = "7"  value="">
+                            <?php
+                            if ($editBlog->return_blog_tag()) {
+                                foreach ($blogTagArr as $v) {
+                                    if (!in_array($v, $sysTagArr)) {
+                                        echo htmlspecialchars($v) . ' ';
+                                    }
+                                }
+                            } else {
+                                
+                            }
+                            ?>
+                        </textarea>
                     </div>
                     <div class="row-title">
                         <input type="hidden" name='blog' value="<?php echo $_GET['blog']; ?>">
