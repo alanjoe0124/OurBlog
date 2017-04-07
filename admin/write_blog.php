@@ -3,31 +3,13 @@ require_once __DIR__ . "/../ClassLib/AutoLoad.php";
 $session = new Session();
 if (!$session->isLogin()) {
     header("Location:/admin/login.php");
+    exit;
 }
 ?>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
-    </head>
-    <body>
-        <div class="container">
-            <!--content_head start-->
-            <div class="headbox">
-                <div class="head-side-box"></div>
-                <div class="head-main-box">
-                    <p>
-                        <?php
-                        echo '<h1><a href="/index.php">OurBlog</a>/write_blog</h1>
-                    &nbsp;&nbsp;<h4><a href="/admin/blog_manage.php">blog manage</a></h4>
-                    &nbsp;&nbsp;<h4><a href="/admin/write_blog.php">blog write</a></h4>';
-                        ?>
-                    </p>
-                    <HR width="100%">
-                </div>
-                <div class="head-side-box"></div>
-            </div>
-            <!--content_head end->
+   <?php
+    require_once __DIR__.'/../common/html/admin_head.html';
+   ?>
             
             <!--contetn_body start-->
             <div class="sidebox"></div>
@@ -40,8 +22,7 @@ if (!$session->isLogin()) {
                             <option value="0" selected="selected">select one please</option>
                             <?php
                             $writeBlog = new WriteBlog();
-                            $arrList = $writeBlog->list_idx_columns();
-                            foreach ($arrList as $key => $value) {
+                            foreach ($writeBlog->list_columns()as $key => $value) {
                                 echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";
                             }
                             ?>
@@ -57,9 +38,8 @@ if (!$session->isLogin()) {
                     <div class="row-title">
                         tag:
                         <?php
-                        $sysTag = $writeBlog->list_sys_tag();
-                        foreach ($sysTag as $vl) {
-                            echo '<label><input name="sys_tag[]" type="checkbox" value="' . $vl['id'] . '"/>' . $vl['tag_name'] . "</label>";
+                        foreach ($writeBlog->list_recommend_tag() as $vl) {
+                            echo '<label><input name="recommend_tag[]" type="checkbox" value="' . $vl['id'] . '"/>' . $vl['tag_name'] . "</label>";
                         }
                         ?>
                     </div>

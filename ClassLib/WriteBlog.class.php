@@ -4,14 +4,14 @@ class WriteBlog extends Blog {
 
     private $blogId;
 
-    public function post_blog() {
-        date_default_timezone_set('Asia/Shanghai');
+    public function post_blog($columnId,$title,$content) {
         Mysql::getInstance()->insert('blog', array(
-            'idx_column_id' => $_POST['column'],
-            'title' => $_POST['title'],
-            'content' => $_POST['content'],
+            'idx_column_id' => $columnId,
+            'title' => $title,
+            'content' => $content,
             'user_id' => $_SESSION['uid'],
-            'post_time' => date("Y-m-d h:i:s")));
+            'post_time' => date("Y-m-d h:i:s")
+            ));
         $this->blogId = Mysql::getInstance()->getLastInsertId();
     }
    
@@ -19,20 +19,23 @@ class WriteBlog extends Blog {
         $res = Mysql::getInstance()->selectRow('select * from tag where tag_name = ?',array($vl));
         if(!$res){
             Mysql::getInstance()->insert('tag', array('tag_name' => $vl));
-            Mysql::getInstance()->insert('blog_tag',array('blog_id'=> $this->blogId, 
-                'tag_id'=>Mysql::getInstance()->getLastInsertId()));
+            Mysql::getInstance()->insert('blog_tag',array(
+                'blog_id'=> $this->blogId, 
+                'tag_id'=>Mysql::getInstance()->getLastInsertId()
+                    ));
         }else{
-            Mysql::getInstance()->insert('blog_tag',array('blog_id'=> $this->blogId, 
-                'tag_id'=>$res['id']));        
+            Mysql::getInstance()->insert('blog_tag',array(
+                'blog_id'=> $this->blogId, 
+                'tag_id'=>$res['id']
+                ));        
         }
         
     }
 
-    public function add_sys_tag($val) {
-        Mysql::getInstance()->insert('blog_tag', array('blog_id' => $this->blogId, 'tag_id' => $val));
+    public function add_recommend_tag($val) {
+        Mysql::getInstance()->insert('blog_tag', array('blog_id' => $this->blogId, 'tag_id' => $val) );
 
     }
-
 }
 ?>
 
