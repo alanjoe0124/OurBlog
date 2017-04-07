@@ -1,8 +1,15 @@
+<?php
+session_start();
+if( isset($_SESSION['uid']) ){
+    header("Location:/admin/blog_manage.php");
+    exit;  
+}
 
+?>
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="../common/css/main.css">
+        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
     </head>
     <body>
         <div class="container">

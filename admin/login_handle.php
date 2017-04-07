@@ -1,36 +1,37 @@
 <?php
 
 require_once __DIR__ . '/../ClassLib/AutoLoad.php';
+require_once __DIR__ . '/../common/function.php';
 
 try {
     if (!isset($_POST['email'])) {
-        throw new InvalidArgumentException("missing required email");
+        throw new InvalidArgumentException("Missing required email");
     }
     if (!isset($_POST['pwd'])) {
-        throw new InvalidArgumentException("miss required pwd");
+        throw new InvalidArgumentException("Missing required password");
     }
-    $len = strlen($_POST['email']);
-    if ($len < 3 || $len > 100) {
+    $emailLength = charNum($_POST['email']);
+    if ($emailLength < 3 || $emailLength > 100) {
         throw new InvalidArgumentException("email minlength 3, maxlength 100");
     }
     $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL);
     if (!$email) {
         throw new InvalidArgumentException("invalid email");
     }
-    $len = strlen($_POST['pwd']);
-    if ($len < 4 || $len > 50) {
+    $pwdLength = charNum($_POST['pwd']);
+    if ($pwdLength < 4 || $pwdLength > 50) {
         throw new InvalidArgumentException("password minlength 4, maxlenght 50");
     }
-    $login = new Login();
-    $res = $login->handle($email, $_POST['pwd'], new Session());
-    if (!$res) {
-        header("Location:/admin/login.php?error=password_failed");
-    } else {
-        header("Location: /admin/blog_manage.php");
-    }
 } catch (InvalidArgumentException $e) {
+    exit($e->getMessage());
     exit("INVALID_PARAMS");
-} catch (Exception $e) {
-    exit("SEVER ERROR");
 }
+$login = new Login;
+$res = $login->handle($email, $_POST['pwd'], new Session());
+if (!$res) {
+    header("Location:/admin/login.php?error=password_failed");
+} else {
+    header("Location:/admin/blog_manage.php");
+}
+
 ?>
