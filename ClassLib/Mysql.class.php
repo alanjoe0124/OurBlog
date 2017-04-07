@@ -14,12 +14,24 @@ Class Mysql {
     private function __clone() {
         
     }
-
+    
     public static function getInstance() {
         if (!(self::$_instance instanceof self)) {
             self::$_instance = new self();
         }
         return self::$_instance;
+    }
+    
+    public function startTrans(){
+        $this->mysql->beginTransaction();
+    }
+    
+    public function commit(){
+        $this->mysql->commit();
+    }
+    
+    public function rollback(){
+        $this->mysql->rollBack();
     }
 
     public function select($table, $data = array(), $where = array()) {
@@ -71,24 +83,38 @@ Class Mysql {
     }
 
     public function delete($table, $bind = array()) {
-        // delete from table where id = ?
-        $sql = "DELETE FROM $table WHERE id = ?";
-        $this->mysql->prepare($sql)->execute($bind);
+        foreach ($bind as $key => $val) {
+            $sql = "DELETE FROM $table WHERE $key = ?";
+            $this->mysql->prepare($sql)->execute(array($val));
+        }
     }
 
-    public function update($table, $bind = array()) {
-      //  $sql = "update $table set idx_column_id = ?,title = ?,content = ?,post_time = ? where id = ?";
+    public function update($table, $bind = array(), $where = array()) {
+        //  $sql = "update $table set idx_column_id = ?,title = ?,content = ?,post_time = ? where id = ?";
         $n = 0;
-        $valuesPlaceholder="";
-        foreach ($bind as $k=>$v){
-            if($n >0){
+        $valuesPlaceholder = "";
+        foreach ($bind as $k => $v) {
+            if ($n > 0) {
                 $valuesPlaceholder .= ",";
-            }  
+            }
             $valuesPlaceholder .= "$k = ?";
-            $n ++;      
+            $n ++;
         }
-        $sql = "UPDATE $table SET ". $valuesPlaceholder;
-        $val=array_values($bind);
+        $m = 0;
+        $placeholder = "";
+        if ($where) {
+            $placeholder = " WHERE ";
+            foreach ($where as $kw => $vw) {
+                if ($m > 0) {
+                    $placeholder .= " AND ";
+                }
+                $placeholder .= "$kw = ?";
+                $m ++;
+            }
+            $bind = array_merge($bind, $where);
+        }
+        $sql = "UPDATE $table SET " . $valuesPlaceholder . $placeholder;
+        $val = array_values($bind);
         $this->mysql->prepare($sql)->execute($val);
     }
 
