@@ -1,92 +1,90 @@
 <?php
 
 require_once __DIR__ . '/../ClassLib/AutoLoad.php';
+require_once __DIR__ . '/../common/function.php';
 try {
     $session = new Session();
-    if (!($session->isLogin())) {
+    if (!$session->isLogin()) {
         header('Location:/admin/login.php');
+        exit;
     }
-    if (!isset($_POST['blog'])) {
-        throw New InvalidArgumentException('Undefined blog');
+    $paramArr = array('blog'=>$_POST['blog'], 'column'=>$_POST['column'], 'title'=>$_POST['title'], 'content'=>$_POST['content']);
+    foreach($paramArr as $key=>$val){
+        if(!isset($val)){
+            throw new InvalidArgumentException('Missing required $key');
+        }
     }
-    if (!isset($_POST['column'])) {
-        throw New InvalidArgumentException('Undefined Column');
+    if (charNum($_POST['title']) > 100) {
+        throw new InvalidArgumentException('Title maxLength 100');
     }
-    if (!isset($_POST['title'])) {
-        throw New InvalidArgumentException('Undefined Title');
-    }
-    if (!isset($_POST['content'])) {
-        throw New InvalidArgumentException('Undefined Content');
-    }
-    if (strlen($_POST['title']) > 100) {
-        throw New InvalidArgumentException('Title maxLength 100');
-    }
-    if (strlen($_POST['content']) > 16777215) {
-        throw New InvalidArgumentException('Content maxLength 16777215');
+    if (charNum($_POST['content']) > 65535) {
+        throw new InvalidArgumentException('Content maxLength 65535');
     }
     $blogId = filter_var($_POST['blog'], FILTER_VALIDATE_INT, array(
         'options' => array('min_range' => 1, 'max_range' => 4294967295)));
     if (!$blogId) {
         throw new InvalidArgumentException('Invalid blog id');
     }
-    $idx_column_id = filter_var($_POST['column'], FILTER_VALIDATE_INT, array(
+    $columnId = filter_var($_POST['column'], FILTER_VALIDATE_INT, array(
         'options' => array('min_range' => 1, 'max_range' => 255)));
-    if (!$idx_column_id) {
-        throw new InvalidArgumentException("invalid column");
+    if (!$columnId) {
+        throw new InvalidArgumentException("Invalid column");
     }
     $editBlog = new EditBlog();
     Mysql::getInstance()->startTrans();
     $editBlog->authority_check($blogId);
     $editBlog->update_blog(
             array(
-        'idx_column_id' => $idx_column_id,
+        'idx_column_id' => $columnId,
         'title' => $_POST['title'],
         'content' => $_POST['content'],
         'post_time' => date("Y-m-d H:i:s")
             ), array('id' => $blogId)
     );
     $countCustomTags = 0;
-    $countSysTags = 0;
+    $countRecommendTags = 0;
     if (isset($_POST['custom_tags']) && trim($_POST['custom_tags']) != '') {
         $arrCustomTags = explode(" ", trim($_POST['custom_tags']));
         $countCustomTags = count($arrCustomTags);
     }
 
-    if (isset($_POST['sys_tag'])) {
-        $countSysTags = count($_POST['sys_tag']);
+    if (isset($_POST['recommend_tag'])) {
+        $countRecommendTags = count($_POST['recommend_tag']);
     }
-    if (($countCustomTags + $countSysTags) > 5) {
-        throw New InvalidArgumentException("Tags' amount should be less than 5");
-    } else if (($countCustomTags + $countSysTags) != 0) {
-        $editBlog->delete_blog_all_tag();
-        if (isset($_POST['sys_tag'])) {
-            foreach ($_POST['sys_tag'] as $val) {
+    if (($countCustomTags + $countRecommendTags) > 5) {
+        throw new InvalidArgumentException("Tags' amount should be less than 5");
+    } else if (($countCustomTags + $countRecommendTags) != 0) {
+        $editBlog->delete_blog_all_tag($blogId);
+        if (isset($_POST['recommend_tag'])) {
+            foreach ($_POST['recommend_tag'] as $val) {
                 $tagId = filter_var($val, FILTER_VALIDATE_INT, array(
                     'options' => array('min_range' => 1, 'max_range' => 4294967295)
                 ));
                 if (!$tagId) {
                     throw new InvalidArgumentException('Invalid tag id');
                 } else {
-                    $editBlog->add_sys_tag($val);
+                    $editBlog->add_recommend_tag($val,$blogId);
                 }
             }
         }
         if (isset($arrCustomTags)) {
             foreach ($arrCustomTags as $vl) {
-                if (strlen($vl) > 20) {
-                    throw New InvalidArgumentException("Each of defined tag's length should be less than 20");
+                if (charNum($vl) > 20) {
+                    throw new InvalidArgumentException("Each of defined tag's length should be less than 20");
                 } else {
-                    $editBlog->add_custom_tag($vl);
+                    $editBlog->add_custom_tag($vl,$blogId);
                 }
             }
         }
     } else {
-        $editBlog->delete_blog_all_tag();
+        $editBlog->delete_blog_all_tag($blogId);
     }
     Mysql::getInstance()->commit();
     header("Location:/admin/blog_manage.php");
+    exit;
 } catch (InvalidArgumentException $e) {
     //echo $e->getMessage();
+    exit($e->getMessage());
     exit("INVALID PARAM");
 } catch (Exception $e) {
     //echo $e->getMessage();
