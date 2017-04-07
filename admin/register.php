@@ -2,10 +2,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="../common/css/main.css">
-<!--
-        <script type="text/javascript" src="../common/js/email_check.js"></script>
--->
+        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
 </head>
     <body>
         <div class="container">
@@ -33,7 +30,7 @@
                 <form  method="post" action="register_handle.php">
 
                     <div class="row-title">
-                        Email:<input type="text"  id="email" name="email"  value="" onblur="return emailCheck('email')" >
+                        Email:<input type="text"  id="email" name="email"  value="">
 
                     </div>
                     <div class="row-title">
