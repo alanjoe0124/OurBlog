@@ -11,16 +11,6 @@ class BlogManage extends Blog {
         Mysql::getInstance()->delete("blog_tag",array('blog_id'=>$blogId));
     }
 
-    public function edit_blog($blogId) {
-        header("Location:/admin/edit_blog.php?blog={$blogId}");
-    }
-
-    public function logout() {
-        session_start();
-        session_destroy();
-        header("Location:/index.php");
-    }
-
 }
 
 ?>

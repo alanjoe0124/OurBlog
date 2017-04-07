@@ -9,36 +9,27 @@ try {
     if (!isset($_GET['action'])) {
         throw new InvalidArgumentException("UNDEFINED ACTION");
     }
-    $action = array('logout', 'edit', 'del');
-    if (!in_array($_GET['action'], $action)) {
-        throw new InvalidArgumentException('ACTION FAILED');
-    }
-    if ($_GET['action'] == "logout") {
-        $blogManage = new BlogManage();
-        $blogManage->logout();
-        header("Location:/index.php");
-    }
     if (!isset($_GET['blog'])) {
-        throw new InvalidArgumentException("Blog not select");
+        throw new InvalidArgumentException("Missing required Blog ID");
     }
     $blogId = filter_var($_GET['blog'], FILTER_VALIDATE_INT, array(
         'options' => array('min_range' => 1, 'max_range' => 4294967295)
     ));
     if (!$blogId) {
-        throw new InvalidArgumentException('Invalid blog id');
+        throw new InvalidArgumentException('Invalid Blog ID');
     }
     $blogManage = new BlogManage();
-	$blogManage->authority_check($blogId);
-	switch ($_GET['action']) {
-            case "del":
-                $blogManage->delete_blog($blogId);
-                header("Location:/admin/blog_manage.php");
-                break;
-            case "edit":
-                $blogManage->edit_blog($blogId);
-                break;
-            default:
-                break;
+    $blogManage->authority_check($blogId);
+    switch ($_GET['action']) {
+        case "del":
+            $blogManage->delete_blog($blogId);
+            header("Location:/admin/blog_manage.php");
+            exit;
+        case "edit":
+            header("Location:/admin/edit_blog.php?blog=$blogId");
+            exit;
+        default:
+            break;
     }
 } catch (InvalidArgumentException $e) {
     exit('INVALID PARAM');
