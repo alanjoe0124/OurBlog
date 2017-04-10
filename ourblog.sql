@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS `blog` (
  `content` text,
  `user_id` tinyint(3) NOT NULL,
  `post_time` datetime DEFAULT NULL,
+ `blog_url` varchar(70) DEFAULT NULL,
  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=118 DEFAULT CHARSET=utf8 ;
 
