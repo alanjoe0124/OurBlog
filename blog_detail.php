@@ -10,6 +10,13 @@ $blogId = filter_var($_GET['blog'], FILTER_VALIDATE_INT, array(
 if (!$blogId) {
     exit('Invalid blog');
 }
+$blogDetail = new BlogDetail;
+$blogURL = $blogDetail->check_url($blogId);
+if($blogURL['blog_url']){
+    header("Location:".$blogURL['blog_url']);
+    exit;
+}
+
 ?>
 <html>
     <head>
@@ -27,8 +34,7 @@ if (!$blogId) {
             <!--contetn_body start-->
             <div class="sidebox"></div>
             <div class="mainbox">
-                <?php
-                $blogDetail = new BlogDetail;
+                <?php 
                 $tagNameString = "";
                 $blogInfo = $blogDetail->list_blog_detail($blogId);
                 $blogTags = $blogDetail->list_blog_tag($blogId);
