@@ -24,6 +24,7 @@ try {
                 "title" => $_POST['title']);
         }
     } else {
+        $flag = false;
         $paramArr = array(
             "column" => $_POST['column'], 
             "title" => $_POST['title'], 

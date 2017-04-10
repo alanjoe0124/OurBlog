@@ -78,8 +78,11 @@ $editBlog->authority_check($blogId);
                 foreach ($recommendTag as $vlue) {
                     $recommendTagArr[$vlue['id']] = $vlue['tag_name'];
                 }
-                foreach ($blogTags as $val) {
-                    $blogTagArr[] = $val['tag_name'];
+                $blogTagArr = array();
+                if($blogTags){
+                    foreach ($blogTags as $val) {
+                        $blogTagArr[] = $val['tag_name'];
+                    }    
                 }
                 foreach ($recommendTagArr as $key => $vl) {
 
