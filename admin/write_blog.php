@@ -32,11 +32,19 @@ if (!$session->isLogin()) {
                     <div class="row-title">
                         title:<input type="text"  id="title" name="title"  value="" placeholder="title...">
                     </div>
+                    <div>
+                    URL:(Add it in right format, or ignore it)
+                    </div>
+                    <div class="row-title">
+                        <input type="text" name="blog_url" value="http://">
+                    </div>
                     <div class="row-text">
                         text:<textarea name="content" rows = "10"  placeholder="text..."></textarea>
                     </div>
+                    <div>
+                    recommend tag:
+                    </div>
                     <div class="row-title">
-                        tag:
                         <?php
                         foreach ($writeBlog->list_recommend_tag() as $vl) {
                             echo '<label><input name="recommend_tag[]" type="checkbox" value="' . $vl['id'] . '"/>' . $vl['tag_name'] . "</label>";
