@@ -52,10 +52,25 @@ $editBlog->authority_check($blogId);
             <div class="row-title">
                 title:<input type="text"  id="title" name="title"  value="<?php echo htmlspecialchars($blogInfo['title']); ?>" >
             </div>
+            <div>
+            URL:(Add it in right format, or ignore it)
+            </div>
+            <div class="row-title">
+                <input type="text" name="blog_url" value="<?php 
+                if(!empty($blogInfo['blog_url'])){
+                    echo htmlspecialchars($blogInfo['blog_url']);
+                }else{
+                    echo "http://";
+                }
+                
+                ?>">
+            </div>
             <div class="row-text">
                 text:<textarea name="content" rows = "10"> <?php echo htmlspecialchars($blogInfo['content']); ?></textarea>
             </div>
+            <div>
             recommend tag:
+            </div>
             <div class="row-title">
                 <?php
                 $recommendTag = $editBlog->list_recommend_tag();
@@ -67,14 +82,14 @@ $editBlog->authority_check($blogId);
                     $blogTagArr[] = $val['tag_name'];
                 }
                 foreach ($recommendTagArr as $key => $vl) {
-                  
-                    if(!empty($blogTagArr)){
-                       if (in_array($vl, $blogTagArr)) {// if sys tag in blog tags, checked = true; else no checked                      
-                           echo '<label><input name="recommend_tag[]" checked="true"  type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
-                       }else{
-                           echo '<label><input name="recommend_tag[]"   type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
-                       }    
-                    }else {
+
+                    if (!empty($blogTagArr)) {
+                        if (in_array($vl, $blogTagArr)) {// if sys tag in blog tags, checked = true; else no checked                      
+                            echo '<label><input name="recommend_tag[]" checked="true"  type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
+                        } else {
+                            echo '<label><input name="recommend_tag[]"   type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
+                        }
+                    } else {
                         echo '<label><input name="recommend_tag[]"   type="checkbox" value="' . $key . '"/>' . $vl . "</label>";
                     }
                 }
