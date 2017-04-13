@@ -11,6 +11,7 @@ class Session {
     }
 
     public function session_set($email, $userDbId) {
+        session_regenerate_id();
         $_SESSION['userEmail'] = $email;
         $_SESSION['uid'] = $userDbId;
     }
