@@ -5,17 +5,16 @@ if (!($session->isLogin())) {
     header('Location:/admin/login.php');
     exit;
 }
-?>
-<html>
- <?php
- require_once __DIR__.'/../common/html/admin_head.html';
+require_once __DIR__.'/../common/front/admin_common.php';
  ?>
             
             <!--contetn_body start-->
-            <div class="sidebox"></div>
             <div class="mainbox">
                 <?php
                 $blogManage = new BlogManage();
+                $csrf_token = rtrim(file_get_contents('/proc/sys/kernel/random/uuid'));
+                Mysql::getInstance()->delete("csrf_token", array('session_uid' => $_SESSION['uid']));
+                Mysql::getInstance()->insert("csrf_token", array('session_uid' => $_SESSION['uid'], 'token' => $csrf_token));
                 foreach ($blogManage->list_user_blog($_SESSION['uid']) as $key => $value) {
                     echo '<div class="row-title">
                             <div class="row-manage-title">
@@ -23,7 +22,7 @@ if (!($session->isLogin())) {
                             </div>
                             <div class="row-manage-action">
                                 <a href="/admin/blog_manage_handle.php?action=edit&blog=' . $value['id'] . '">edit</a>/
-                                <a href="/admin/blog_manage_handle.php?action=del&blog=' . $value['id'] . '">delete</a>
+                                <a href="/admin/blog_manage_handle.php?action=del&blog=' . $value['id'] . '&token='.$csrf_token.'">delete</a>
                             </div>
                          </div>';
                 }

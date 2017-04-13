@@ -10,7 +10,6 @@ class BlogManage extends Blog {
         Mysql::getInstance()->delete("blog", array('id'=>$blogId));
         Mysql::getInstance()->delete("blog_tag",array('blog_id'=>$blogId));
     }
-
 }
 
 ?>
