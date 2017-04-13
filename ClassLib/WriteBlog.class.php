@@ -9,26 +9,11 @@ class WriteBlog extends Blog {
         $this->blogId = Mysql::getInstance()->getLastInsertId();
     }
 
-    public function add_custom_tag($vl) {
-        $res = Mysql::getInstance()->selectRow('select * from tag where tag_name = ?', array($vl));
-        if (!$res) {
-            Mysql::getInstance()->insert('tag', array('tag_name' => $vl));
-            Mysql::getInstance()->insert('blog_tag', array(
-                'blog_id' => $this->blogId,
-                'tag_id' => Mysql::getInstance()->getLastInsertId()
-            ));
-        } else {
-            Mysql::getInstance()->insert('blog_tag', array(
-                'blog_id' => $this->blogId,
-                'tag_id' => $res['id']
-            ));
+    public function insert_blog_tag($tagIdArray = array()) {
+        foreach ($tagIdArray as $value) {
+            Mysql::getInstance()->insert('blog_tag', array('blog_id' => $this->blogId, 'tag_id' => $value));
         }
     }
-
-    public function add_recommend_tag($val) {
-        Mysql::getInstance()->insert('blog_tag', array('blog_id' => $this->blogId, 'tag_id' => $val));
-    }
-
 }
-?>
 
+?>
