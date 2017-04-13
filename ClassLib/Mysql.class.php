@@ -83,10 +83,20 @@ Class Mysql {
     }
 
     public function delete($table, $bind = array()) {
-        foreach ($bind as $key => $val) {
-            $sql = "DELETE FROM $table WHERE $key = ?";
-            $this->mysql->prepare($sql)->execute(array($val));
+        //  DELETE FROM TABLE WHERE XX = ? AND XX = ?
+        $placeholder = array_keys($bind);
+        $where = "WHERE ";
+        $n = 0;
+        foreach($placeholder as $value){
+            if($n > 0){
+                $where.=" AND ";
+            }
+            $n++;
+            $where.="$value = ?";
         }
+        $sql = "DELETE FROM ".$table. " ".$where;
+        $arrVal = array_values($bind);
+        $this->mysql->prepare($sql)->execute($arrVal);
     }
 
     public function update($table, $bind = array(), $where = array()) {
