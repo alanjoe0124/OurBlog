@@ -33,5 +33,21 @@ if ($blogTagRows = $blogExt->get_usual_tag()) {
 <div class="sidebox"></div>
 <!--contetn_body end-->
 </div>
+<script>
+    var $check_box_click = function () {
+        if ($("#checkURL").attr("checked") == "true") {
+            $("#content").toggle();
+            $("#url").toggle();
+        } else {
+            $("#content").toggle();
+            $("#url").toggle();
+        }
+    }
+    $(document).ready(function () {
+        $("#url").hide();
+        $("#content").show();
+        $("#checkURL").click($check_box_click);
+    });
+</script>
 </body>
 </html>
