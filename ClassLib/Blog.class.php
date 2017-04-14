@@ -11,9 +11,9 @@ class Blog {
 
     public static function list_columns() { // used by WriteBlog and Index
         $res = Mysql::getInstance()->selectAll("select * from index_column");
-        foreach ($res  as $value){
+        foreach ($res as $value) {
             $array[$value["id"]] = $value["name"];
-        } 
+        }
         return $array;
     }
 
@@ -86,13 +86,19 @@ class Blog {
             if (isset($_POST[$key])) {
                 if ($key == "custom_tag") {
                     $_POST[$key] = trim($_POST[$key]);
+                    if (mb_strlen($_POST[$key], "utf-8") > 104) {
+                        exit("Each of tag's length should be less than 20");
+                    }
                     if (!empty($_POST[$key])) {
                         $subTagNameArr = explode(" ", $_POST[$key]);
                     }
                 } else {
+                    if (!is_array($_POST[$key])) {
+                        exti("Invalid Param");
+                    }
                     $subTagNameArr = $_POST[$key];
                 }
-                if (isset($subTagNameArr)) { // don't execute when $_POST[custom_tag] is empty 
+                if (isset($subTagNameArr)) { // don"t execute when $_POST[custom_tag] is empty 
                     foreach ($subTagNameArr as $v) {
                         if (strlen($v) > 20 || empty($v)) {
                             exit("Each of tag's length should be less than 20, and not empty");
