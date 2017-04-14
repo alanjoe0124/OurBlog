@@ -10,6 +10,7 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
         <div class="container">
             <!--content_head start-->
             <?php
+            $classInclude= true;
             require_once __DIR__ . '/common/front/index_common.php';
             ?> 
             <!--content_head end->

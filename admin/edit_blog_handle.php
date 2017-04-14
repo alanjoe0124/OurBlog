@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/../ClassLib/AutoLoad.php';
 try {
+    $classInclude = true;
     require_once __DIR__ . '/../common/admin/validate_blog.php';
 
     $blogId = filter_var($_POST['blog'], FILTER_VALIDATE_INT, array(

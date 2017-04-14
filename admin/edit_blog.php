@@ -67,8 +67,8 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             <?php
             $blogTags = $editBlog->return_blog_tag($blogId); 
             if ($blogTags) {
-                foreach ($blogTags as $val) {
-                    echo '<label><input name="current_tag[]"  checked="true" type="checkbox" value="'.$val['tag_name'].'"/>'.$val['tag_name']."</label>";
+                foreach ($blogTags as $value) {
+                    echo '<label><input name="current_tag[]"  checked="true" type="checkbox" value="'.$value['tag_name'].'"/>'.$value['tag_name']."</label>";
                 }
             }
             ?>
@@ -76,7 +76,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
         
         <input type="hidden" name='blog' value="<?php echo $blogId; ?>">
 <?php
-        $blogExt = $editBlog;
+        $blogExtInstance = $editBlog;
         require_once __DIR__ . '/../common/front/form_bottom.php';
 ?>
 

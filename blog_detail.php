@@ -27,6 +27,7 @@ if($blogURL['blog_url']){
         <div class="container">
             <!--content_head start-->
             <?php
+            $classInclude= true;
             require_once __DIR__.'/common/front/index_common.php';
             ?>    
             <!--content_head end->
@@ -39,8 +40,8 @@ if($blogURL['blog_url']){
                 $blogInfo = $blogDetail->list_blog_detail($blogId);
                 $blogTags = $blogDetail->list_blog_tag($blogId);
                 if ($blogTags) {
-                    foreach ($blogTags as $va) {
-                        $tagNameString .= '<a href="/search.php?tag='.$va['tag_name'].'">' . $va['tag_name'] . '</a>&nbsp;&nbsp;';
+                    foreach ($blogTags as $value) {
+                        $tagNameString .= '<a href="/search.php?tag='.$value['tag_name'].'">' . $value['tag_name'] . '</a>&nbsp;&nbsp;';
                     }
                     echo '<div class="row-title-leftAlign"><h2>'
                     . htmlspecialchars($blogInfo['title'])

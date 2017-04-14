@@ -10,7 +10,8 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
         <div class="container">
             <!--content_head start-->
             <?php
-            require_once __DIR__ . '/common/html/index_head.html';
+            $classInclude= true;
+            require_once __DIR__.'/common/front/index_common.php';
             ?> 
             <!--content_head end->
             
@@ -25,7 +26,7 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                 } else {
                     $col = NULL;
                 }
-                $index = new Index;
+                $index = new Index();
                 $listBlogs = $index->list_blogs($col);
                 if ($listBlogs) {
                     foreach ($listBlogs as $valBlg) {

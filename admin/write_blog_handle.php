@@ -3,12 +3,14 @@
 require_once __DIR__ . '/../ClassLib/AutoLoad.php';
 
 try {
+    $classInclude = true;
     require_once __DIR__ . '/../common/admin/validate_blog.php';
 } catch (InvalidArgumentException $e) {
     // exit($e->getMessage());
     exit("Param ERROR");
 }
 // post blog with url
+Mysql::getInstance()->startTrans();
 if ($isInvalidURL) {
     $writeBlog = new WriteBlog();
     $writeBlog->post_blog(array(
@@ -46,7 +48,7 @@ if (count($tagNameArr) > 5) {
     exit("Tags' amount should be less than 5");
 }
 try {
-    Mysql::getInstance()->startTrans();
+    
 // get tag name's related id
     $tagIdArr = array();
     foreach ($tagNameArr as $value) {

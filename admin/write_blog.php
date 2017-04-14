@@ -37,7 +37,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             text:<textarea name="content" rows = "10"  placeholder="text..."></textarea>
         </div>
 <?php
-        $blogExt = $writeBlog;
+        $blogExtInstance = $writeBlog;
         require_once __DIR__ . '/../common/front/form_bottom.php';
 ?>
 

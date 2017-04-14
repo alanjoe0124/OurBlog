@@ -1,8 +1,13 @@
+<?php 
+if(!isset($_SESSION['uid'])){
+    exit("Permission denied");
+}
+?>
 <html>
     <head>
         <meta charset="utf-8">
         <link rel="stylesheet" type="text/css" href="/common/css/main.css">
-        <script   src="https://code.jquery.com/jquery-3.2.1.min.js"   integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="   crossorigin="anonymous"></script>
+        <script   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     </head>
     <body>
         <div class="container">
