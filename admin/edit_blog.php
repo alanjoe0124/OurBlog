@@ -34,12 +34,11 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             <select name="column">
                 <?php
                 $blogInfo = $editBlog->list_blog_detail($blogId);
-                $columns = $editBlog->list_columns();
-                foreach ($columns as $value) {
-                    if ($blogInfo['idx_column_id'] == $value['id']) {
-                        echo '<option value="' . $value['id'] . '" selected="selected"> ' . $value['name'] . '</option>';
+                foreach (Blog::list_columns() as $key => $value) {
+                    if ($blogInfo['idx_column_id'] == $key) {
+                        echo '<option value="' . $key . '" selected="selected"> ' . $value . '</option>';
                     } else {
-                        echo '<option value="' . $value['id'] . '" > ' . $value['name'] . '</option>';
+                        echo '<option value="' . $key . '" > ' . $value . '</option>';
                     }
                 }
                 ?>

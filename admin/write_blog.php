@@ -17,9 +17,8 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             <select name="column">
                 <option value="0" selected="selected">select one please</option>
                 <?php
-                $writeBlog = new WriteBlog();
-                foreach ($writeBlog->list_columns() as $value) {
-                    echo "<option value=\"{$value['id']}\" > {$value['name']}</option>";
+                foreach (Blog::list_columns() as $key => $value) {
+                    echo "<option value=\"$key\" > $value</option>";
                 }
                 ?>
             </select>
@@ -37,7 +36,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             text:<textarea name="content" rows = "10"  placeholder="text..."></textarea>
         </div>
 <?php
-        $blogExtInstance = $writeBlog;
+        $blogExtInstance = new WriteBlog();
         require_once __DIR__ . '/../common/front/form_bottom.php';
 ?>
 

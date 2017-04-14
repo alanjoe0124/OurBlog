@@ -16,10 +16,8 @@ if (!isset($classInclude)) {
             } else {
                 echo '&nbsp;&nbsp;<h1><a href="/admin/blog_manage.php">admin</a></h1>';
             }
-            ;
-            $listColumns = Blog::list_columns();
-            foreach ($listColumns as $value) {
-                echo '&nbsp;<h4><a href="index.php?col=' . $value['id'] . '">' . $value['name'] . '</a></h4>';
+            foreach (Blog::list_columns() as $key => $value) {
+                echo '&nbsp;<h4><a href="index.php?col=' . $key . '">' . $value . '</a></h4>';
             }
             ?>
         </div>

@@ -10,7 +10,11 @@ class Blog {
     }
 
     public static function list_columns() { // used by WriteBlog and Index
-        return Mysql::getInstance()->selectAll("select * from index_column");
+        $res = Mysql::getInstance()->selectAll("select * from index_column");
+        foreach ($res  as $value){
+            $array[$value["id"]] = $value["name"];
+        } 
+        return $array;
     }
 
     public function list_recommend_tag() { // used by WriteBlog and EditBlog
