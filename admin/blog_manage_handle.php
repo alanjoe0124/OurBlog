@@ -25,15 +25,18 @@ $blogManage = new BlogManage();
 $blogManage->authority_check($blogId);
 switch ($_GET['action']) {
     case "del":
-        if (!isset($_GET['token'])) {
-            exit('Permission Denied');
+        if (!isset($_SERVER['HTTP_REFERER'])) {
+            exit('Permission denied');
         }
-        $existCsrf = Mysql::getInstance()->selectRow("SELECT * FROM csrf_token WHERE session_uid = ? AND token = ?", array(
-            $_SESSION['uid'],
-            $_GET['token']
-        ));
-        if (!$existCsrf) {
-            exit('Permission Denied');
+        if (strlen($_SERVER['HTTP_REFERER']) > 70) {
+            exit('Permission denied');
+        }
+        $httpReferer = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL);
+        if ($httpReferer) {
+            $refererArr = parse_url($_SERVER["HTTP_REFERER"]);
+            if ($refererArr['host'] != 'ourblog.dev') {
+                exit('Permission denied');
+            }
         }
         $blogManage->delete_blog($blogId);
         header("Location:/admin/blog_manage.php");

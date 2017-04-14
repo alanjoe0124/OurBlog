@@ -5,18 +5,19 @@
         header('Location:/admin/login.php');
         exit;
     }
-
-    if (!isset($_POST['csrf_token'])) {
-        throw new InvalidArgumentException('Permission Denied');
+    if(!isset($_SERVER['HTTP_REFERER'])){
+        throw new InvalidArgumentException('Permission denied');
     }
-    $existCsrf = Mysql::getInstance()->selectRow("SELECT * FROM csrf_token WHERE session_uid = ? AND token = ?", array(
-        $_SESSION['uid'],
-        $_POST['csrf_token']
-    ));
-    if (!$existCsrf) {
-        throw new InvalidArgumentException('Permission Denied');
+    if (strlen($_SERVER['HTTP_REFERER']) > 70 ){
+        throw new InvalidArgumentException('Permission denied');
     }
-
+    $httpReferer = filter_var($_SERVER['HTTP_REFERER'], FILTER_VALIDATE_URL);
+    if($httpReferer){
+        $refererArr =  parse_url($_SERVER["HTTP_REFERER"]);
+        if($refererArr['host'] != 'ourblog.dev'){
+            exit('Permission denied');
+        }
+    }
     //check if url exists. 
     if (isset($_POST['blog_url']) && trim($_POST['blog_url']) != '') {
         $blogURL = filter_var($_POST['blog_url'], FILTER_VALIDATE_URL);
@@ -47,7 +48,7 @@
         throw new InvalidArgumentException("Invalid column");
     }
 
-    $titleLength = mb_strlen($_POST['title']);
+    $titleLength = mb_strlen($_POST['title'],'utf-8');
     if ($titleLength > 100 || $titleLength < 1) {
         throw new InvalidArgumentException('Title maxLength 100 , minLength 1');
     }
