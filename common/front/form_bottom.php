@@ -19,18 +19,20 @@ if (!isset($blogExtInstance)) {
     <input type="text" name="custom_tag" value="" placeholder="tags separated with space"> 
 </div>
 <?php
-if ($blogTagRows = $blogExtInstance->get_usual_tag()) {
-    echo '<div>usual tag:</div><div class="row-title">';
+$blogTagRows = $blogExtInstance->get_latest_tag();
+
+if (!empty($blogTagRows)) {
+    echo '<div>lastest tag:</div><div class="row-title">';
     foreach ($blogTagRows as $value) {
-        $tagNameRow = Mysql::getInstance()->selectRow('select * from tag where id = ?', array($value['tag_id']));
-        $tagName = $tagNameRow['tag_name'];
-        echo '<label><input name="usual_tag[]" type="checkbox" value="' . $tagName . '"/>' . $tagName . "</label>";
+        echo '<label><input name="latest_tag[]" type="checkbox" value="' . $value . '"/>' . $value . "</label>";
     }
     echo '</div>';
 }
+
+
 ?>
 <div class="row-title">
-    <input type="submit" name='submit' value="submit">
+    <button type="submit">submit</button>
 </div>   
 </form>
 
