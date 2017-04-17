@@ -11,7 +11,11 @@ class WriteBlog extends Blog {
 
     public function insert_blog_tag($tagIdArray = array()) {
         foreach ($tagIdArray as $value) {
-            Mysql::getInstance()->insert('blog_tag', array('blog_id' => $this->blogId, 'tag_id' => $value));
+            Mysql::getInstance()->insert('blog_tag', array(
+                'blog_id' => $this->blogId, 
+                'tag_id' => $value, 
+                'time'=>date('Y-m-d H:i:s') 
+                ));
         }
     }
 }

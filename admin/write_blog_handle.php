@@ -40,32 +40,17 @@ if ($isInvalidURL) {
 }
 // check tag and filter it, add invalid or nothing to do
 
-$paramTag = array("custom_tag", "recommend_tag", "usual_tag");
-$tagNameArr = $writeBlog->validate_tag($paramTag);
+$paramTag = array("custom_tag", "recommend_tag", "latest_tag");
+$submitTagNameArr = $writeBlog->validate_tag($paramTag);
 
 
-if (count($tagNameArr) > 5) {
+if (count($submitTagNameArr) > 5) {
     exit("Tags' amount should be less than 5");
 }
 try {
-    
 // get tag name's related id
-    $tagIdArr = array();
-    foreach ($tagNameArr as $value) {
-        $res = Mysql::getInstance()->selectRow("SELECT * FROM tag WHERE tag_name = ?", array($value));
-        if ($res) {
-            if (!in_array($res['id'], $tagIdArr)) {
-                $tagIdArr[] = $res['id'];
-            }
-        } else {
-            Mysql::getInstance()->insert('tag', array('tag_name' => $value));
-            $tagIdArr[] = Mysql::getInstance()->getLastInsertId();
-        }
-    }
-
+    $tagIdArr = $writeBlog->get_submit_tag_id($submitTagNameArr);
     $writeBlog->insert_blog_tag($tagIdArr);
-// update the usual tag
-    $writeBlog->update_usual_tag(new SplQueue(), $tagIdArr);
     Mysql::getInstance()->commit();
 } catch (Exception $e) {
     Mysql::getInstance()->rollback();

@@ -21,91 +21,63 @@ class Blog {
         return Mysql::getInstance()->selectAll("select * from tag limit 0,4");
     }
 
-    public function get_usual_tag() {  // used by WriteBlog and EditBlog
-        return Mysql::getInstance()->selectAll('SELECT * FROM user_usual_tag WHERE user_id = ?', array($_SESSION['uid']));
+    public function get_latest_tag() {  // used by WriteBlog and EditBlog
+        $array = array();
+        $res = Mysql::getInstance()->selectAll(
+                "select distinct tag_name
+            from blog 
+            join blog_tag on blog.id = blog_tag.blog_id
+            join tag on tag.id = blog_tag.tag_id
+            where blog.user_id = ? order by time desc limit 0,10", array($_SESSION['uid'])
+        );
+        foreach ($res as $value) {
+            $array[] = $value['tag_name'];
+        }
+        return $array;
     }
 
-    public function queque_tag(SplQueue $q, $newArr = array(), $oldUsualTag = array(), $num) {  // used by WriteBlog and EditBlog
-        // push old usual tag then push new submit tag, ignore the dup in new, push new and pop the oldest one when capacity full
-        if (!empty($oldUsualTag)) {
-            foreach ($oldUsualTag as $va) {
-                if ($q->count() < $num) {
-                    $q->enqueue($va);
-                } else {
-                    $q->dequeue();
-                    $q->enqueue($va);
-                }
-            }
-        }
-        foreach ($newArr as $val) {
-            if (!in_array($val, $oldUsualTag)) {
-                if ($q->count() < $num) {
-                    $q->enqueue($val);
-                } else {
-                    $q->dequeue();
-                    $q->enqueue($val);
-                }
-            }
+    public function get_submit_tag_id($submitTagNameArr) {
+        $tagIdArr = array();
+        $submitTagNameInDb = array();
+        $placeholder = '?' . str_repeat(',?', count($submitTagNameArr) - 1);
+        $existTagRes = Mysql::getInstance()->selectAll("SELECT * FROM tag WHERE tag_name in ($placeholder)", $submitTagNameArr);
+        foreach ($existTagRes as $value) {
+            $tagIdArr[] = $value['id'];
+            $submitTagNameInDb[] = $value['tag_name'];
         }
 
-        return $q;
-    }
-
-    public function update_usual_tag(SplQueue $q, $tagIdArr = array()) { // used by WriteBlog and EditBlog
-        $oldUsualTag = array();
-        if ($rs = $this->get_usual_tag()) {
-            foreach ($rs as $vll) {
-                $oldUsualTag[] = $vll['tag_id'];
-            }
+        $submitTagNameNoInDb = array_diff($submitTagNameArr, $submitTagNameInDb);
+        foreach ($submitTagNameNoInDb as $value) {
+            Mysql::getInstance()->insert('tag', array('tag_name' => $value));
+            $tagIdArr[] = Mysql::getInstance()->getLastInsertId();
         }
-        $usualTagQueque = $this->queque_tag($q, $tagIdArr, $oldUsualTag, 10);
-        $tagQuequeCount = $usualTagQueque->count();
-        for ($i = 0; $i < $tagQuequeCount; $i++) {
-            $usualTagArr[] = $usualTagQueque->dequeue();
-        }
-
-        // delete old no dup tagId when tags capacity become 10
-        if ($tagQuequeCount == 10) {
-            foreach ($oldUsualTag as $value) {
-                if (!in_array($value, $usualTagArr)) {
-                    Mysql::getInstance()->delete("user_usual_tag", array('user_id' => $_SESSION['uid'], 'tag_id' => $value));
-                }
-            }
-        }
-        // insert new usual tag when it is not dup to the old
-        foreach ($usualTagArr as $vv) {
-            if (!in_array($vv, $oldUsualTag)) {
-                Mysql::getInstance()->insert("user_usual_tag", array('user_id' => $_SESSION['uid'], 'tag_id' => $vv));
-            }
-        }
+        return $tagIdArr;
     }
 
     public function validate_tag($paramTag) {  // used by WriteBlog and EditBlog
+        // validate tag name and reduce the dup tag name
         $tagNameArr = array();
         foreach ($paramTag as $key) {
             if (isset($_POST[$key])) {
                 if ($key == "custom_tag") {
-                    $_POST[$key] = trim($_POST[$key]);
-                    if (mb_strlen($_POST[$key], "utf-8") > 104) {
-                        exit("Each of tag's length should be less than 20");
-                    }
+                    $customTagArr = explode(" ", trim($_POST[$key]));
                     if (!empty($_POST[$key])) {
                         $subTagNameArr = explode(" ", $_POST[$key]);
+                    } else {
+                        continue;
                     }
                 } else {
                     if (!is_array($_POST[$key])) {
-                        exti("Invalid Param");
+                        exit("Invalid Param");
                     }
                     $subTagNameArr = $_POST[$key];
                 }
-                if (isset($subTagNameArr)) { // don"t execute when $_POST[custom_tag] is empty 
-                    foreach ($subTagNameArr as $v) {
-                        if (strlen($v) > 20 || empty($v)) {
-                            exit("Each of tag's length should be less than 20, and not empty");
-                        }
-                        if (!in_array($v, $tagNameArr)) {
-                            $tagNameArr[] = $v;
-                        }
+                foreach ($subTagNameArr as $v) {
+                    if (strlen($v) > 20 || $v == "") {
+                        exit("Each of tag's length should be less than 20, and not empty");
+                    }
+                    if (!in_array($v, $tagNameArr)) {
+                        $tagNameArr[] = $v;
                     }
                 }
             }

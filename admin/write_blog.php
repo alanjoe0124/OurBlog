@@ -28,7 +28,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             title:<input type="text"  id="title" name="title"  value="" placeholder="title...">
         </div>
 
-        <input id="checkURL" type="checkbox" >Add URL?
+        <label><input id="checkURL" type="checkbox" >Add URL?</label>
         <div id="url" class="row-title">
             URL<input type="text" name="blog_url" placeholder="http://">
         </div>
