@@ -16,7 +16,8 @@ try {
     exit("Param ERROR");
 }
 
-  // update blog with url
+// update blog with url
+Mysql::getInstance()->startTrans();
 if ($isInvalidURL) {
     $editBlog = new EditBlog();
     $editBlog->update_blog(array(
@@ -26,7 +27,7 @@ if ($isInvalidURL) {
         'content' => NULL,
         'user_id' => $_SESSION['uid'],
         'post_time' => date("Y-m-d h:i:s")
-    ),array('id'=>$blogId));
+            ), array('id' => $blogId));
 } else {
     // update blog with content
     try {
@@ -36,7 +37,7 @@ if ($isInvalidURL) {
     } catch (InvalidArgumentException $e) {
         exit("Param ERROR");
     }
-    
+
     $editBlog = new EditBlog();
     $editBlog->update_blog(array(
         'idx_column_id' => $columnId,
@@ -45,44 +46,31 @@ if ($isInvalidURL) {
         'content' => $_POST['content'],
         'user_id' => $_SESSION['uid'],
         'post_time' => date("Y-m-d h:i:s")
-    ),array('id'=>$blogId));
+            ), array('id' => $blogId));
 }
 
 // check tag and filter it, add invalid or nothing to do
 
 
-$paramTag = array("custom_tag", "recommend_tag", "usual_tag", "current_tag");
-$tagNameArr = $editBlog->validate_tag($paramTag);
+$paramTag = array("custom_tag", "recommend_tag", "latest_tag", "current_tag");
+$submitTagNameArr = $editBlog->validate_tag($paramTag);
 
-if (count($tagNameArr) > 5) {
+if (count($submitTagNameArr) > 5) {
     exit("Tags' amount should be less than 5");
 }
 
 try {
-    Mysql::getInstance()->startTrans();
 // get tag name's related id
-    $tagIdArr = array();
-    foreach ($tagNameArr as $value) {
-        $res = Mysql::getInstance()->selectRow("SELECT * FROM tag WHERE tag_name = ?", array($value));
-        if ($res) {
-            if (!in_array($res['id'], $tagIdArr)) {
-                $tagIdArr[] = $res['id'];
-            }
-        } else {
-            Mysql::getInstance()->insert('tag', array('tag_name' => $value));
-            $tagIdArr[] = Mysql::getInstance()->getLastInsertId();
-        }
+    $tagIdArr = $editBlog->get_submit_tag_id($submitTagNameArr);
+    if (!empty($tagIdArr)) {
+        $editBlog->update_blog_tag($tagIdArr, $blogId);
+    } else {
+        Mysql::getInstance()->delete("blog_tag", array('blog_id' => $blogId));
     }
- if(!empty($tagIdArr)){
-    $editBlog->update_blog_tag(new SplQueue(), $tagIdArr, $blogId);
-    $editBlog->update_usual_tag(new SplQueue(), $tagIdArr);   
- }else{
-    Mysql::getInstance()->delete("blog_tag", array('blog_id' => $blogId));
- }
-    
     Mysql::getInstance()->commit();
 } catch (Exception $e) {
     Mysql::getInstance()->rollback();
+    exit($e->getMessage());
     exit('SERVER ERROR');
 }
 header("Location:/admin/blog_manage.php");

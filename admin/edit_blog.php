@@ -10,7 +10,7 @@ try {
         throw new InvalidArgumentException("Invalid blog");
     }
     $blogId = filter_var($_GET['blog'], FILTER_VALIDATE_INT, array(
-        'options' => array('min_range' => 1, 'max_range' => 4294967295)
+        'options' => array('min_range' => 1)
     ));
     if (!$blogId) {
         throw new InvalidArgumentException('Invalid blog id');
@@ -65,9 +65,9 @@ require_once __DIR__ . '/../common/front/admin_common.php';
         <div class="row-title">
             <?php
             $blogTags = $editBlog->return_blog_tag($blogId); 
-            if ($blogTags) {
+            if (!empty($blogTags)) {
                 foreach ($blogTags as $value) {
-                    echo '<label><input name="current_tag[]"  checked="true" type="checkbox" value="'.$value['tag_name'].'"/>'.$value['tag_name']."</label>";
+                    echo '<label><input name="current_tag[]"  checked="true" type="checkbox" value="'.$value.'"/>'.$value."</label>";
                 }
             }
             ?>
