@@ -1,6 +1,6 @@
 <?php
-$session = new Session();
-if (!$session->isLogin()) {
-    header("Location:/admin/login.php");
+session_start();
+if (!isset($_SESSION['uid'])) {
+    header("Location:http://localhost/Ourblog/admin/login.php");
     exit;
 }

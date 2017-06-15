@@ -4,45 +4,45 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/main.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/css/bootstrap.min.css">
     </head>
     <body>
         <div class="container">
-            <!--content_head start-->
-            <?php
-            $classInclude= true;
-            require_once __DIR__.'/common/front/index_common.php';
-            ?> 
-            <!--content_head end->
-            
-            <!--contetn_body start-->
-            <div class="sidebox"></div>
-            <div class="mainbox">
+            <div class="row">
                 <?php
-                
-                if (isset($_GET['col'])) {
-                    $col = filter_var($_GET['col'], FILTER_VALIDATE_INT, array(
-                        'options' => array('min_range' => 1, 'max_range' => 255)));
-                } else {
-                    $col = NULL;
-                }
-                $index = new Index();
-                $listBlogs = $index->list_blogs($col);
-                if ($listBlogs) {
-                    foreach ($listBlogs as $valBlg) {
-                        echo '<div class="row-title">
+                $permission = true;
+                require_once __DIR__ . '/common/front/index_common.php';
+                ?> 
+                <div class="sidebox"></div>
+                <div class="mainbox">
+                    <?php
+                    if (isset($_GET['col'])) {
+                        $col = filter_var($_GET['col'], FILTER_VALIDATE_INT, array(
+                            'options' => array('min_range' => 1, 'max_range' => 255)));
+                    } else {
+                        $col = NULL;
+                    }
+                    if (!$col) {
+                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog");
+                    } else {
+                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog where idx_column_id = ? ", array($col));
+                    }
+                    if ($listBlogs) {
+                        foreach ($listBlogs as $blogInfo) {
+                            echo '<div class="row-title">
                                         <div class="row-title-leftAlign">
-                                            <a href="/blog_detail.php?blog=' . $valBlg['id'] . '">' . htmlspecialchars($valBlg['title']) . '</a>
+                                            <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
                                         </div>
                                     </div>';
+                        }
                     }
-                }
-                ?>
-
+                    ?>
+                </div>
             </div>
-            <div class="sidebox"></div>
-            <!--contetn_body end-->
         </div>
+        <script src="http://localhost/Ourblog/common/js/jquery-3.2.1.min.js"></script>
+        <script src="http://localhost/Ourblog/common/bootstrap/js/bootstrap.min.js"></script>
     </body>
 </html>
 

@@ -1,9 +1,76 @@
 <?php
 require_once __DIR__ . '/../ClassLib/AutoLoad.php';
+if ($_POST) {
+    try {
+        $blogId = filter_var($_POST['blog'], FILTER_VALIDATE_INT, array(
+            'options' => array('min_range' => 1)
+        ));
+        if (!$blogId) {
+            throw new InvalidArgumentException('Invalid blog id');
+        }
+        session_start();
+        $data = Mysql::getInstance()->selectRow("SELECT id FROM blog WHERE id = ? AND user_id = ?", array($blogId, $_SESSION['uid']));
+        if (!$data) {
+            exit("sorry, permission denied");
+        }
+        $permission = true;
+        require_once __DIR__ . '/../common/admin/validate_blog.php';
+    } catch (InvalidArgumentException $e) {
+// exit($e->getMessage());
+        exit("Param ERROR");
+    }
+
+// update blog with url
+    Mysql::getInstance()->startTrans();
+    try {
+        Mysql::getInstance()->update("blog", array(
+            'idx_column_id' => $columnId,
+            'title' => $_POST['title'],
+            'content' => $_POST['content'],
+            'user_id' => $_SESSION['uid'],
+            'post_time' => date("Y-m-d h:i:s")
+                ), array('id' => $blogId));
+        
+
+        if (isset($_POST['tags'])) {
+            $tagIdArr = array();
+            $tags = explode(',', $_POST['tags']);
+            foreach ($tags as $tag) {
+                $tagRow = Mysql::getInstance()->selectRow("select id from tag where tag_name = ?", array($tag));
+                $tagId = $tagRow['id'];
+                if (!$tagRow) {
+                    Mysql::getInstance()->insert('tag', array('tag_name' => $tag));
+                    $tagId = Mysql::getInstance()->getLastInsertId();
+                }
+                $tagIdArr[] = $tagId;
+            }
+            $existTagIdArr = array();
+            $blogTagRows = Mysql::getInstance()->selectAll("SELECT tag_id FROM blog_tag WHERE blog_id = ?", array($blogId));
+            foreach ($blogTagRows as $row) {
+                $existTagIdArr[] = $row['tag_id'];
+            }
+            $diffArr = array_diff($tagIdArr, $existTagIdArr);
+            $reDiffArr = array_diff($existTagIdArr, $tagIdArr);
+            foreach ($diffArr as $diffTagId) {
+                Mysql::getInstance()->insert('blog_tag', array('blog_id' => $blogId, 'tag_id' => $diffTagId));
+            }
+            foreach ($reDiffArr as $reDiffTagId) {
+                Mysql::getInstance()->delete('blog_tag',array('tag_id' => $reDiffTagId));
+            }
+        }
+        Mysql::getInstance()->commit();
+    } catch (Exception $e) {
+        Mysql::getInstance()->rollback();
+        exit('SERVER ERROR');
+    }
+    header("Location:http://localhost/Ourblog/admin/blog_manage.php");
+    exit;
+}
+
 try {
-    $session = new Session();
-    if (!$session->isLogin()) {
-        header('Location:/admin/login.php');
+    session_start();
+    if (!isset($_SESSION['uid'])) {
+        header('Location:http://localhost/Ourblog/admin/login.php');
         exit;
     }
     if (!isset($_GET['blog'])) {
@@ -19,22 +86,29 @@ try {
     exit("INVALID PARAM");
 }
 
-$editBlog = new EditBlog();
-$editBlog->authority_check($blogId);
+$data = Mysql::getInstance()->selectRow("SELECT id FROM blog WHERE id = ? AND user_id = ?", array($blogId, $_SESSION['uid']));
+if (!$data) {
+    exit("sorry, permission denied");
+}
 
 require_once __DIR__ . '/../common/front/admin_common.php';
 ?>
 
-<!--contetn_body start-->
 <div class="mainbox">
-    <form  method="post" action="edit_blog_handle.php">
-
+    <form  method="post" action="edit_blog.php">
         <div class="row-title">
             column:
             <select name="column">
                 <?php
-                $blogInfo = $editBlog->list_blog_detail($blogId);
-                foreach (Blog::list_columns() as $key => $value) {
+                if (isset($blogId)) {
+                    $blogInfo = Mysql::getInstance()->selectRow("SELECT title, content, idx_column_id FROM blog WHERE id = ?", array($blogId));
+                }
+                $columnRows = Mysql::getInstance()->selectAll("select id, name from index_column");
+                foreach ($columnRows as $row) {
+                    $columns[$row['id']] = $row['name'];
+                }
+
+                foreach ($columns as $key => $value) {
                     if ($blogInfo['idx_column_id'] == $key) {
                         echo '<option value="' . $key . '" selected="selected"> ' . $value . '</option>';
                     } else {
@@ -43,39 +117,42 @@ require_once __DIR__ . '/../common/front/admin_common.php';
                 }
                 ?>
             </select>
-
         </div>
         <div class="row-title">
             title:<input type="text"  id="title" name="title"  value="<?php echo htmlspecialchars($blogInfo['title']); ?>" >
         </div>
-        <input id="checkURL" type="checkbox" >Add URL?
-        <div id="url" class="row-title">
-            URL<input type="text" name="blog_url" placeholder="http://" value="<?php
-            if (!empty($blogInfo['blog_url'])) {
-                echo htmlspecialchars($blogInfo['blog_url']);
-            }
-            ?>">
-        </div>
         <div id="content" class="row-text">
             text:<textarea name="content" rows = "10"  placeholder="text..."><?php echo htmlspecialchars($blogInfo['content']); ?></textarea>
         </div>
-        <div>
-            current tags:
-        </div>
-        <div class="row-title">
+        <div class="row-tags">
+            <p>custom tags:</p>
+            <input id="tags" type="text" class="tags" name="tags"  value="
             <?php
-            $blogTags = $editBlog->return_blog_tag($blogId); 
-            if (!empty($blogTags)) {
-                foreach ($blogTags as $value) {
-                    echo '<label><input name="current_tag[]"  checked="true" type="checkbox" value="'.$value.'"/>'.$value."</label>";
+                $tagArr = array();
+                $rows = Mysql::getInstance()
+                ->selectAll('SELECT tag.tag_name as tag_name 
+                        FROM blog
+                        JOIN blog_tag ON blog.id = blog_tag.blog_id
+                        JOIN tag ON blog_tag.tag_id = tag.id
+                        WHERE blog.id = ?', array($blogId));
+                foreach($rows as $row) {
+                    $tagArr[] = $row['tag_name'];
                 }
-            }
-            ?>
-        </div> 
-        
+                echo implode(',', $tagArr);
+            ?> "/>
+        </div>
         <input type="hidden" name='blog' value="<?php echo $blogId; ?>">
-<?php
-        $blogExtInstance = $editBlog;
-        require_once __DIR__ . '/../common/front/form_bottom.php';
-?>
+        <div class="row-title">
+            <button type="submit">submit</button>
+        </div>   
+    </form>
+</div>
+</div>
+<script>
+    $(function () {
+        $('#tags').tagsInput({width: 'auto'});
+    });
+</script>
+</body>
+</html>
 

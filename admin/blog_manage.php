@@ -1,33 +1,29 @@
 <?php
 require_once __DIR__ . '/../ClassLib/AutoLoad.php';
-$session = new Session();
-if (!($session->isLogin())) {
-    header('Location:/admin/login.php');
+session_start();
+if (!isset($_SESSION['uid'])) {
+    header('Location:http://localhost/Ourblog/admin/login.php');
     exit;
 }
-require_once __DIR__.'/../common/front/admin_common.php';
- ?>
-            
-            <!--contetn_body start-->
-            <div class="mainbox">
-                <?php
-                $blogManage = new BlogManage();
-                foreach ($blogManage->list_user_blog($_SESSION['uid']) as $key => $value) {
-                    echo '<div class="row-title">
-                            <div class="row-manage-title">
-                                <a href="/blog_detail.php?blog=' . $value['id'] . '">' . htmlspecialchars($value['title']) . '</a>
-                            </div>
-                            <div class="row-manage-action">
-                                <a href="/admin/blog_manage_handle.php?action=edit&blog=' . $value['id'] . '">edit</a>/
-                                <a href="/admin/blog_manage_handle.php?action=del&blog=' . $value['id'] . '">delete</a>
-                            </div>
-                         </div>';
-                }
-                ?>
-            </div>
-            <div class="sidebox"></div>
-            <!--contetn_body end-->
-        </div>
-    </body>
+require_once __DIR__ . '/../common/front/admin_common.php';
+?>
+
+<div class="mainbox">
+    <?php
+    $uesrBlogs = Mysql::getInstance()->selectAll("select id, title from blog where user_id = ?", array($_SESSION['uid']));
+    foreach ($uesrBlogs as $blogInfo) {
+            echo '<div class="row-title">
+                                    <div class="row-manage-title">
+                                        <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
+                                    </div>
+                                    <div class="row-manage-action">
+                                        <a href="http://localhost/Ourblog/admin/edit_blog.php?blog=' . $blogInfo['id'] . '">edit</a>/
+                                        <a href="http://localhost/Ourblog/admin/delete.php?blog=' . $blogInfo['id'] . '">delete</a>
+                                    </div>
+                     </div>';
+    }
+    ?>
+</div>
+</body>
 </html>
 

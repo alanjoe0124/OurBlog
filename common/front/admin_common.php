@@ -1,4 +1,4 @@
-<?php 
+<?php
 if(!isset($_SESSION['uid'])){
     exit("Permission denied");
 }
@@ -6,8 +6,12 @@ if(!isset($_SESSION['uid'])){
 <html>
     <head>
         <meta charset="utf-8">
-        <link rel="stylesheet" type="text/css" href="/common/css/main.css">
-        <script   src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/main.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/jquery.tagsinput.min.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/css/bootstrap.min.css">
+        <script   src="http://localhost/Ourblog/common/js/jquery-3.2.1.min.js"></script>
+        <script type="text/javascript" src="http://localhost/Ourblog/common/js/jquery.tagsinput.min.js"></script>
+        <script src="http://localhost/Ourblog/common/bootstrap/js/bootstrap.min.js"></script>
     </head>
     <body>
         <div class="container">
@@ -16,17 +20,17 @@ if(!isset($_SESSION['uid'])){
                 <div class="head-side-box"></div>
                 <div class="head-main-box">
                     <p>
-                    <h1><a href="/index.php">OurBlog</a></h1>
+                    <h3><a href="http://localhost/Ourblog/index.php">OurBlog</a></h3>
                     &nbsp;&nbsp;
-                    <h4><a href="/admin/blog_manage.php">blog manage</a></h4>
+                    <h4><a href="http://localhost/Ourblog/admin/blog_manage.php">blog manage</a></h4>
                     &nbsp;&nbsp;
-                    <h4><a href="/admin/write_blog.php">blog write</a></h4>
+                    <h4><a href="http://localhost/Ourblog/admin/write_blog.php">blog write</a></h4>
                     </p>
-                    <h4><?php echo $_SESSION['userEmail']; ?>|<a href="/admin/logout.php">logout</a></h4>
+                    <h5><?php echo $_SESSION['userEmail']; ?>|<a href="http://localhost/Ourblog/admin/logout.php">logout</a></h5>
 
                     <HR width="100%">
                 </div>
                 <div class="head-side-box"></div>
             </div>
             <!--content_head end-->
-  <div class="sidebox"></div>
+            <div class="sidebox"></div>
