@@ -71,20 +71,9 @@ if ($_POST) {
                         }
                     }
                     ?>
-                    <form  method="post" action="login.php"
-                           data-fv-framework="bootstrap"
-                           data-fv-message="This value is not valid"
-                           data-fv-icon-valid="glyphicon glyphicon-ok"
-                           data-fv-icon-invalid="glyphicon glyphicon-remove"
-                           data-fv-icon-validating="glyphicon glyphicon-refresh"
-                           data-fv-live="enabled">
-
+                    <form  method="post" action="login.php">
                         <div class="row-title">
-                            Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="email"  id="email" name="email"  value="" 
-                                                                       data-fv-emailaddress="true"
-                                                                       data-fv-emailaddress-message="The value is not a valid email address"
-                                                                       data-fv-notempty="true"
-                                                                       data-fv-notempty-message="The value can't be empty">
+                            Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="email"  id="email" name="email"  value="">
                         </div>
                         <div class="row-title">
                             password:<input type="password"  id="pwd" name="pwd"  value="">
