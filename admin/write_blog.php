@@ -21,16 +21,19 @@ if ($_POST) {
     try {
         Mysql::getInstance()->insert('blog', $paramArr);
         $blogId = Mysql::getInstance()->getLastInsertId();
-
         if (isset($_POST['tags'])) {
-            $tags = explode(',', $_POST['tags']);
-            foreach ($tags as $tag) {
-                $tagRow = Mysql::getInstance()->selectRow("select id from tag where tag_name = ?", array($tag));
-                if (!$tagRow) {
-                    Mysql::getInstance()->insert('tag', array('tag_name' => $tag));
-                    $tagId = Mysql::getInstance()->getLastInsertId();
+            if ($_POST['tags'] != '') {
+                $tags = explode(',', $_POST['tags']);
+                foreach ($tags as $tag) {
+                    $tagRow = Mysql::getInstance()->selectRow("select id from tag where tag_name = ?", array($tag));
+                    if (!$tagRow) {
+                        Mysql::getInstance()->insert('tag', array('tag_name' => $tag));
+                        $tagId = Mysql::getInstance()->getLastInsertId();
+                        Mysql::getInstance()->insert('blog_tag', array('blog_id' => $blogId, 'tag_id' => $tagId));
+                    } else {
+                        Mysql::getInstance()->insert('blog_tag', array('blog_id' => $blogId, 'tag_id' => $tagRow['id']));
+                    }
                 }
-                Mysql::getInstance()->insert('blog_tag', array('blog_id' => $blogId, 'tag_id' => $tagRow['id']));
             }
         }
     } catch (Exception $e) {

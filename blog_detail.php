@@ -52,7 +52,6 @@ if (!$blogId) {
                 ?>
 
             </div>
-            <div class="sidebox"></div>
         </div>
         <script src="http://localhost/Ourblog/common/js/jquery-3.2.1.min.js"></script>
         <script src="http://localhost/Ourblog/common/bootstrap/js/bootstrap.min.js"></script>
