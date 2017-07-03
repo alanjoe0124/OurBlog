@@ -48,7 +48,7 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                     }
                     ?>
                 </div>
-                <div class="row">
+                <div class="row page">
                     <div class="col-md-8 col-md-offset-2">
                          <?php  echo $page->show() ; ?>
                     </div>
