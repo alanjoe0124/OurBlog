@@ -4,8 +4,11 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
 <html>
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/main.css">
         <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/font-awesome/css/font-awesome.min.css">
     </head>
     <body>
         <div class="container">
@@ -14,8 +17,7 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                 $permission = true;
                 require_once __DIR__ . '/common/front/index_common.php';
                 ?> 
-                <div class="sidebox"></div>
-                <div class="mainbox">
+                <div class="row"  style="height: 450px">
                     <?php
                     if (isset($_GET['col'])) {
                         $col = filter_var($_GET['col'], FILTER_VALIDATE_INT, array(
@@ -23,21 +25,28 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                     } else {
                         $col = NULL;
                     }
+                    $page = new Page( 10);
                     if (!$col) {
-                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog");
+                        $page->totalPages = ceil( Mysql::getInstance()->count("select count(*) from blog") / $page->listRows ) ;
+                      
+                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog limit ".  ($page->offset). ",". ($page->listRows) );
                     } else {
-                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog where idx_column_id = ? ", array($col));
+                        $page->totalPages = ceil( Mysql::getInstance()->count("select count(*) from blog where idx_column_id = ". $col) / $page->listRows );
+                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog where idx_column_id = ?  limit ". ($page->offset). ",". ( $page->listRows), array($col));
                     }
                     if ($listBlogs) {
                         foreach ($listBlogs as $blogInfo) {
-                            echo '<div class="row-title">
-                                        <div class="row-title-leftAlign">
+                            echo '<div class="col-md-8 col-md-offset-2">
                                             <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
-                                        </div>
-                                    </div>';
+                                        </div><br><br>';
                         }
                     }
                     ?>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 col-md-offset-2">
+                         <?php  echo $page->show() ; ?>
+                    </div>
                 </div>
             </div>
         </div>

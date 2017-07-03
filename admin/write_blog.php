@@ -22,7 +22,7 @@ if ($_POST) {
         Mysql::getInstance()->insert('blog', $paramArr);
         $blogId = Mysql::getInstance()->getLastInsertId();
         if (isset($_POST['tags'])) {
-            if ($_POST['tags'] != '') {
+            if (trim($_POST['tags']) != '') {
                 $tags = explode(',', $_POST['tags']);
                 foreach ($tags as $tag) {
                     $tagRow = Mysql::getInstance()->selectRow("select id from tag where tag_name = ?", array($tag));
@@ -47,37 +47,45 @@ require_once __DIR__ . '/../common/front/admin_common.php';
 ?>
 
 
-<div class="mainbox">
-    <form  method="post" action="write_blog.php">
-        <div class="row-title">
-            column:
-            <select name="column">
-                <option value="0" selected="selected">select one please</option>
-                <?php
-                $columnRows = Mysql::getInstance()->selectAll("select * from index_column");
-                foreach ($columnRows as $row) {
-                    $columns[$row['id']] = $row['name'];
-                }
-                foreach ($columns as $columnId => $columnName) {
-                    echo '<option value=' . $columnId . '>' . $columnName . '</option>';
-                }
-                ?>
-            </select>
-        </div>
-        <div class="row-title">
-            title:<input type="text"  id="title" name="title"  value="" placeholder="title...">
-        </div>
-        <div id="content" class="row-text">
-            text:<textarea name="content" rows = "10"  placeholder="text..."></textarea>
-        </div>
-        <div class="row-tags">
-            <p>custom tags:</p>
-            <input id="tags" type="text" class="tags" name="tags"  />
-        </div>
-        <div class="row-title">
-            <button type="submit">submit</button>
-        </div>   
-    </form>
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <form  method="post" action="write_blog.php">
+            <div class="form-group row">
+                <div class="col-md-4 control-label"> column: </div>
+                <div class="col-md-4">
+                    <select class="form-control" name="column">
+                        <option value="0" selected="selected">select one please</option>
+                        <?php
+                        $columnRows = Mysql::getInstance()->selectAll("select * from index_column");
+                        foreach ($columnRows as $row) {
+                            $columns[$row['id']] = $row['name'];
+                        }
+                        foreach ($columns as $columnId => $columnName) {
+                            echo '<option value=' . $columnId . '>' . $columnName . '</option>';
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 control-label">title:</div>
+                <div class="col-md-4"><input class="form-control" type="text"  id="title" name="title"  value="" placeholder="title..."></div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 control-label">text:</div>
+                <div class="col-md-4"><textarea class="form-control" name="content" rows = "10"  placeholder="text..."></textarea></div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 control-label">custom tags:</div>
+                <div class="col-md-4"><input class="form-control" id="tags" type="text" class="tags" name="tags"  /></div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 col-md-offset-4">
+                <button type="submit">submit</button>
+                </div>
+            </div>   
+        </form>
+    </div>
 </div>
 </div>
 <script>

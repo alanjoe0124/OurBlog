@@ -8,21 +8,28 @@ if (!isset($_SESSION['uid'])) {
 require_once __DIR__ . '/../common/front/admin_common.php';
 ?>
 
-<div class="mainbox">
-    <?php
-    $uesrBlogs = Mysql::getInstance()->selectAll("select id, title from blog where user_id = ?", array($_SESSION['uid']));
-    foreach ($uesrBlogs as $blogInfo) {
-            echo '<div class="row-title">
-                                    <div class="row-manage-title">
+<div class="row">
+    <div class="col-md-8 col-md-offset-2" style="height: 450px">
+        <?php
+        $page = new Page(10);
+        $page->totalPages = ceil(Mysql::getInstance()->count("select count(*) from blog where user_id = " . $_SESSION['uid']) / $page->listRows);
+        $uesrBlogs = Mysql::getInstance()->selectAll("select id, title from blog where user_id = ? limit " . ($page->offset) . "," . ( $page->listRows), array($_SESSION['uid']));
+        foreach ($uesrBlogs as $blogInfo) {
+            echo '<div class="col-md-12">
+                                    <div class="col-md-4">
                                         <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
                                     </div>
-                                    <div class="row-manage-action">
+                                    <div class="col-md-2 col-md-offset-6">
                                         <a href="http://localhost/Ourblog/admin/edit_blog.php?blog=' . $blogInfo['id'] . '">edit</a>/
                                         <a href="http://localhost/Ourblog/admin/delete.php?blog=' . $blogInfo['id'] . '">delete</a>
                                     </div>
-                     </div>';
-    }
-    ?>
+                     </div><br><br>';
+        }
+        ?>
+    </div>
+    <div class="col-md-8 col-md-offset-2">
+        <?php echo $page->show(); ?>
+    </div>
 </div>
 </body>
 </html>

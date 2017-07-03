@@ -46,24 +46,26 @@ if ($_POST) {
 <html>
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/main.css">
         <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/font-awesome/css/font-awesome.min.css">
     </head>
     <body>
         <div class="container">
-            <div class="row">
-                <div class="headbox">
-                    <div class="head-side-box"></div>
 
-                    <div class="head-main-box">
-                        <p><h3><a href="http://localhost/Ourblog/index.php">OurBlog</a>/Login</h3>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="col-md-8 col-md-offset-2">        
+                        <h3><a href="http://localhost/Ourblog/index.php">OurBlog</a>/Login</h3>
                         <HR width="100%">
                     </div>
-                    <div class="head-side-box"></div>
                 </div>
-                <div class="sidebox"></div>
+            </div>
 
-                <div class="mainbox">
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
                     <?php
                     if (isset($_GET['error'])) {
                         if ($_GET['error'] == 'password_failed') {
@@ -72,22 +74,26 @@ if ($_POST) {
                     }
                     ?>
                     <form  method="post" action="login.php">
-                        <div class="row-title">
-                            Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="email"  id="email" name="email"  value="">
+                        <div class="form-group">
+                            <div class="col-md-4 control-label">Email:</div>
+                            <div class="col-md-4"> <input class="form-control" type="email"  id="email" name="email"  value=""></div>
                         </div>
-                        <div class="row-title">
-                            password:<input type="password"  id="pwd" name="pwd"  value="">
+                        <br><br>
+                        <div class="form-group">
+                            <div class="col-md-4 control-label"> password: </div>
+                            <div class="col-md-4"><input class="form-control" type="password"  id="pwd" name="pwd"  value=""></div>
                         </div>
-                        <div class="row-title">
-                            <button type="submit" class="btn btn-default">Submit</button>    
+                        <br><br>
+                        <div class="form-group">
+                            <div class="col-md-4 col-md-offset-4">
+                                <button type="submit" class="btn btn-default">Submit</button>
+                            </div>
                         </div>   
                     </form>
                 </div>
-
             </div>
         </div>
         <script src="http://localhost/Ourblog/common/js/jquery-3.2.1.min.js"></script>
         <script src="http://localhost/Ourblog/common/bootstrap/js/bootstrap.min.js"></script>
     </body>
 </html>
-

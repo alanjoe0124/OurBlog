@@ -33,7 +33,13 @@ Class Mysql {
     public function rollback(){
         $this->mysql->rollBack();
     }
-
+    
+    public function count( $sql ) {
+        $q = $this->mysql->query( $sql );
+        $rows = $q->fetch();
+        return $rows[0];
+    }
+    
     public function select($table, $data = array(), $where = array()) {
         // select * from table where id=? AND name=?...
         $column = "*";

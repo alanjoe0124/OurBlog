@@ -30,32 +30,34 @@ if ($_POST) {
             'user_id' => $_SESSION['uid'],
             'post_time' => date("Y-m-d h:i:s")
                 ), array('id' => $blogId));
-        
+
 
         if (isset($_POST['tags'])) {
-            $tagIdArr = array();
-            $tags = explode(',', $_POST['tags']);
-            foreach ($tags as $tag) {
-                $tagRow = Mysql::getInstance()->selectRow("select id from tag where tag_name = ?", array($tag));
-                $tagId = $tagRow['id'];
-                if (!$tagRow) {
-                    Mysql::getInstance()->insert('tag', array('tag_name' => $tag));
-                    $tagId = Mysql::getInstance()->getLastInsertId();
+            if (trim($_POST['tags']) != '') {
+                $tagIdArr = array();
+                $tags = explode(',', $_POST['tags']);
+                foreach ($tags as $tag) {
+                    $tagRow = Mysql::getInstance()->selectRow("select id from tag where tag_name = ?", array($tag));
+                    $tagId = $tagRow['id'];
+                    if (!$tagRow) {
+                        Mysql::getInstance()->insert('tag', array('tag_name' => $tag));
+                        $tagId = Mysql::getInstance()->getLastInsertId();
+                    }
+                    $tagIdArr[] = $tagId;
                 }
-                $tagIdArr[] = $tagId;
-            }
-            $existTagIdArr = array();
-            $blogTagRows = Mysql::getInstance()->selectAll("SELECT tag_id FROM blog_tag WHERE blog_id = ?", array($blogId));
-            foreach ($blogTagRows as $row) {
-                $existTagIdArr[] = $row['tag_id'];
-            }
-            $diffArr = array_diff($tagIdArr, $existTagIdArr);
-            $reDiffArr = array_diff($existTagIdArr, $tagIdArr);
-            foreach ($diffArr as $diffTagId) {
-                Mysql::getInstance()->insert('blog_tag', array('blog_id' => $blogId, 'tag_id' => $diffTagId));
-            }
-            foreach ($reDiffArr as $reDiffTagId) {
-                Mysql::getInstance()->delete('blog_tag',array('tag_id' => $reDiffTagId));
+                $existTagIdArr = array();
+                $blogTagRows = Mysql::getInstance()->selectAll("SELECT tag_id FROM blog_tag WHERE blog_id = ?", array($blogId));
+                foreach ($blogTagRows as $row) {
+                    $existTagIdArr[] = $row['tag_id'];
+                }
+                $diffArr = array_diff($tagIdArr, $existTagIdArr);
+                $reDiffArr = array_diff($existTagIdArr, $tagIdArr);
+                foreach ($diffArr as $diffTagId) {
+                    Mysql::getInstance()->insert('blog_tag', array('blog_id' => $blogId, 'tag_id' => $diffTagId));
+                }
+                foreach ($reDiffArr as $reDiffTagId) {
+                    Mysql::getInstance()->delete('blog_tag', array('tag_id' => $reDiffTagId));
+                }
             }
         }
         Mysql::getInstance()->commit();
@@ -94,58 +96,66 @@ if (!$data) {
 require_once __DIR__ . '/../common/front/admin_common.php';
 ?>
 
-<div class="mainbox">
-    <form  method="post" action="edit_blog.php">
-        <div class="row-title">
-            column:
-            <select name="column">
-                <?php
-                if (isset($blogId)) {
-                    $blogInfo = Mysql::getInstance()->selectRow("SELECT title, content, idx_column_id FROM blog WHERE id = ?", array($blogId));
-                }
-                $columnRows = Mysql::getInstance()->selectAll("select id, name from index_column");
-                foreach ($columnRows as $row) {
-                    $columns[$row['id']] = $row['name'];
-                }
+<div class="row">
+    <div class="col-md-8 col-md-offset-2">
+        <form  method="post" action="edit_blog.php">
+            <div class="form-group row">
+                <div class="col-md-4 control-label">column:</div>
+                <div class="col-md-4">
+                    <select name="column">
+                        <?php
+                        if (isset($blogId)) {
+                            $blogInfo = Mysql::getInstance()->selectRow("SELECT title, content, idx_column_id FROM blog WHERE id = ?", array($blogId));
+                        }
+                        $columnRows = Mysql::getInstance()->selectAll("select id, name from index_column");
+                        foreach ($columnRows as $row) {
+                            $columns[$row['id']] = $row['name'];
+                        }
 
-                foreach ($columns as $key => $value) {
-                    if ($blogInfo['idx_column_id'] == $key) {
-                        echo '<option value="' . $key . '" selected="selected"> ' . $value . '</option>';
-                    } else {
-                        echo '<option value="' . $key . '" > ' . $value . '</option>';
-                    }
-                }
-                ?>
-            </select>
-        </div>
-        <div class="row-title">
-            title:<input type="text"  id="title" name="title"  value="<?php echo htmlspecialchars($blogInfo['title']); ?>" >
-        </div>
-        <div id="content" class="row-text">
-            text:<textarea name="content" rows = "10"  placeholder="text..."><?php echo htmlspecialchars($blogInfo['content']); ?></textarea>
-        </div>
-        <div class="row-tags">
-            <p>custom tags:</p>
-            <input id="tags" type="text" class="tags" name="tags"  value="
-            <?php
-                $tagArr = array();
-                $rows = Mysql::getInstance()
-                ->selectAll('SELECT tag.tag_name as tag_name 
+                        foreach ($columns as $key => $value) {
+                            if ($blogInfo['idx_column_id'] == $key) {
+                                echo '<option value="' . $key . '" selected="selected"> ' . $value . '</option>';
+                            } else {
+                                echo '<option value="' . $key . '" > ' . $value . '</option>';
+                            }
+                        }
+                        ?>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 control-label">title:</div>
+                <div class="col-md-4"><input class="form-control" type="text"  id="title" name="title"  value="<?php echo htmlspecialchars($blogInfo['title']); ?>" ></div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 control-label">text:</div>
+                <div class="col-md-4"><textarea class="form-control" name="content" rows = "10"  placeholder="text..."><?php echo htmlspecialchars($blogInfo['content']); ?></textarea></div>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-4 control-label">custom tags:</div>
+                <div class="col-md-4"><input class="form-control" id="tags" type="text" class="tags" name="tags"  value="
+                    <?php
+                    $tagArr = array();
+                    $rows = Mysql::getInstance()
+                            ->selectAll('SELECT tag.tag_name as tag_name 
                         FROM blog
                         JOIN blog_tag ON blog.id = blog_tag.blog_id
                         JOIN tag ON blog_tag.tag_id = tag.id
                         WHERE blog.id = ?', array($blogId));
-                foreach($rows as $row) {
-                    $tagArr[] = $row['tag_name'];
-                }
-                echo implode(',', $tagArr);
-            ?> "/>
-        </div>
-        <input type="hidden" name='blog' value="<?php echo $blogId; ?>">
-        <div class="row-title">
-            <button type="submit">submit</button>
-        </div>   
-    </form>
+                    foreach ($rows as $row) {
+                        $tagArr[] = $row['tag_name'];
+                    }
+                    echo implode(',', $tagArr);
+                    ?> "/></div>
+            </div>
+            <input type="hidden" name='blog' value="<?php echo $blogId; ?>">
+            <div class="form-group row">
+                <div class="col-md-4 col-md-offset-4">
+                    <button type="submit">submit</button>
+                </div>
+            </div>   
+        </form>
+    </div>
 </div>
 </div>
 <script>

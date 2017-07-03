@@ -51,47 +51,54 @@ if ($_POST) {
 <html>
     <head>
         <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/main.css">
         <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/font-awesome/css/font-awesome.min.css">
     </head>
     <body>
         <div class="container">
             <!--content_head start-->
-            <div class="headbox">
-                <div class="head-side-box"></div>
-                <div class="head-main-box">
-                    <p><h3><a href="http://localhost/Ourblog/index.php">OurBlog</a>/register</h3>
+            <div class="row">
+
+                <div class="col-md-8 col-md-offset-2">
+                    <h3><a href="http://localhost/Ourblog/index.php">OurBlog</a>/register</h3>
                     <HR width="100%">
                 </div>
-                <div class="head-side-box"></div>
+
             </div>
             <!--content_head end->
             
             <!--contetn_body start-->
-            <div class="sidebox"></div>
-            <div class="mainbox">
-                <?php
-                if (isset($_GET['error'])) {
-                    if ($_GET['error'] == 'INVALID_PARAMS') {
-                        echo '<p style="color:red">参数不对</p>';
+            <div class="row">
+                <div class="col-md-8 col-md-offset-2">
+                    <?php
+                    if (isset($_GET['error'])) {
+                        if ($_GET['error'] == 'INVALID_PARAMS') {
+                            echo '<p style="color:red">参数不对</p>';
+                        }
                     }
-                }
-                ?>
-                <form  method="post" action="register.php">
-
-                    <div class="row-title">
-                        Email:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="text"  id="email" name="email"  value="">
-
-                    </div>
-                    <div class="row-title">
-                        password:<input type="password"  id="pwd" name="pwd"  value="">
-                    </div>
-                    <div class="row-title">
-                        <button type="submit" class="btn btn-default">Submit</button> 
-                    </div>   
-                </form>
+                    ?>
+                    <form  method="post" action="register.php">
+                        <div class="form-group">
+                            <div class="col-md-4 control-label">Email:</div>
+                            <div  class="col-md-4"><input class="form-control" type="text"  id="email" name="email"  value=""></div>
+                        </div>
+                        <br><br>
+                        <div class="form-group">
+                            <div class="col-md-4 control-label">password:</div>
+                            <div class="col-md-4"> <input class="form-control" type="password"  id="pwd" name="pwd"  value=""></div>
+                        </div>
+                         <br><br>
+                        <div class="form-group">
+                            <div class="col-md-4 col-md-offset-4">
+                                <button type="submit" class="btn btn-default">Submit</button>
+                            </div>
+                        </div>   
+                    </form>
+                </div>
             </div>
-            <div class="sidebox"></div>
             <!--contetn_body end-->
         </div>
         <script src="http://localhost/Ourblog/common/js/jquery-3.2.1.min.js"></script>
