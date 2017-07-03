@@ -22,16 +22,19 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
             <!--contetn_body start-->
 
             <div class="row">
-                <div class="col-md-8 col-md-offset-2">
+                <div class="col-md-8 col-md-offset-2" style="height: 450px">
                     <?php
+                    $page = new Page( 10);
+                    
                     if (isset($_GET['tag'])) {
                         $tagRow = Mysql::getInstance()->selectRow("SELECT id FROM tag WHERE tag_name = ?", array($_GET['tag']));
                         if ($tagRow) {
+                            $page->totalPages = ceil( Mysql::getInstance()->count("select count(*) from blog_tag where tag_id = ".$tagRow['id']) / $page->listRows ) ;
                             $blogByTag = Mysql::getInstance()->selectAll(
                                     "SELECT blog.id, blog.title FROM blog_tag 
                                             join blog 
                                             on blog_tag.blog_id = blog.id 
-                                            WHERE tag_id = ?", array($tagRow['id'])
+                                            WHERE tag_id = ? limit ". ($page->offset). ",". ( $page->listRows), array($tagRow['id'])
                             );
                             foreach ($blogByTag as $value) {
                                 echo '<div class="col-md-12">
@@ -41,6 +44,9 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                         }
                     }
                     ?>
+                </div>
+                <div class="col-md-8 col-md-offset-2">
+                     <?php  echo $page->show() ; ?>
                 </div>
             </div> 
 
