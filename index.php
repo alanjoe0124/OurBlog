@@ -29,16 +29,21 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                     if (!$col) {
                         $page->totalPages = ceil( Mysql::getInstance()->count("select count(*) from blog") / $page->listRows ) ;
                       
-                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog limit ".  ($page->offset). ",". ($page->listRows) );
+                        $listBlogs = Mysql::getInstance()->selectAll("select blog.id as id, title, post_time, email from blog join user on user.id = blog.user_id order by post_time desc limit ".  ($page->offset). ",". ($page->listRows) );
                     } else {
                         $page->totalPages = ceil( Mysql::getInstance()->count("select count(*) from blog where idx_column_id = ". $col) / $page->listRows );
-                        $listBlogs = Mysql::getInstance()->selectAll("select id, title from blog where idx_column_id = ?  limit ". ($page->offset). ",". ( $page->listRows), array($col));
+                        $listBlogs = Mysql::getInstance()
+                        ->selectAll("select blog.id as id, title, post_time, email from blog join user on user.id = blog.user_id  where idx_column_id = ? order by post_time desc limit ". 
+                         ($page->offset). ",". ( $page->listRows) , array($col));
                     }
                     if ($listBlogs) {
                         foreach ($listBlogs as $blogInfo) {
                             echo '<div class="col-md-8 col-md-offset-2 list" onclick="window.location.href=\'http://localhost/Ourblog/blog_detail.php?blog='.$blogInfo['id'].'\'">
-                                            <a href="javascript:void(0)">' . htmlspecialchars($blogInfo['title']) . '</a>
-                                        </div><br><br>';
+                                       <div class="col-md-5"><a href="javascript:void(0)">' . htmlspecialchars($blogInfo['title']) . '</a></div><div class="col-md-4">'.
+                                       $blogInfo['email'].
+                                       '</div><div class="col-md-3">'.
+                                       $blogInfo['post_time'].
+                                       '</div></div><br><br>';
                         }
                     }
                     ?>

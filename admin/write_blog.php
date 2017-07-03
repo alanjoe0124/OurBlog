@@ -14,7 +14,7 @@ if ($_POST) {
         'title' => $_POST['title'],
         'user_id' => $_SESSION['uid'],
         'content' => $_POST['content'],
-        'post_time' => date("Y-m-d h:i:s")
+        'post_time' => date("Y-m-d H:i:s")
     );
 
     Mysql::getInstance()->startTrans();

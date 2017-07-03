@@ -28,7 +28,7 @@ if ($_POST) {
             'title' => $_POST['title'],
             'content' => $_POST['content'],
             'user_id' => $_SESSION['uid'],
-            'post_time' => date("Y-m-d h:i:s")
+            'post_time' => date("Y-m-d H:i:s")
                 ), array('id' => $blogId));
 
 
