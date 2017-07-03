@@ -15,7 +15,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
         $page->totalPages = ceil(Mysql::getInstance()->count("select count(*) from blog where user_id = " . $_SESSION['uid']) / $page->listRows);
         $uesrBlogs = Mysql::getInstance()->selectAll("select id, title from blog where user_id = ? limit " . ($page->offset) . "," . ( $page->listRows), array($_SESSION['uid']));
         foreach ($uesrBlogs as $blogInfo) {
-            echo '<div class="col-md-12">
+            echo '<div class="col-md-12 list">
                                     <div class="col-md-4">
                                         <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
                                     </div>

@@ -36,8 +36,8 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                     }
                     if ($listBlogs) {
                         foreach ($listBlogs as $blogInfo) {
-                            echo '<div class="col-md-8 col-md-offset-2">
-                                            <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
+                            echo '<div class="col-md-8 col-md-offset-2 list" onclick="window.location.href=\'http://localhost/Ourblog/blog_detail.php?blog='.$blogInfo['id'].'\'">
+                                            <a href="javascript:void(0)">' . htmlspecialchars($blogInfo['title']) . '</a>
                                         </div><br><br>';
                         }
                     }

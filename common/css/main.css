@@ -1,6 +1,6 @@
 h3{display: inline;}
 h5{display: inline;}
 h4{display: inline;}
-a{text-decoration:none}
-
+a{text-decoration:none;}
+.list:hover{  background-color: #EBEBEB}
 #email{display:inline}
