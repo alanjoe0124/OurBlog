@@ -34,6 +34,14 @@ Class Mysql {
         $this->mysql->rollBack();
     }
     
+    public function exec($sql) {
+        return  $this->mysql->exec($sql);
+    }
+    
+    public function query($sql) {
+        return $this->mysql->query($sql);
+    }
+
     public function count( $sql ) {
         $q = $this->mysql->query( $sql );
         $rows = $q->fetch();
