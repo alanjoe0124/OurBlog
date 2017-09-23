@@ -121,7 +121,7 @@ if (!$blogId) {
                         <div class="col-md-4">
                             <button type="button" class="btn btn-default"  onclick="show_comment_form(<?php echo $row['id'] ?>)">回复</button>
                             <?php 
-                            if ($_SESSION) {
+                            if (isset($_SESSION['userEmail'])) {
                             if ($_SESSION['userEmail'] == $row['email']): 
                             ?>
                             <a href="/Ourblog/deleteComment.php?blogId=<?php echo $blogId; ?>&commentId=<?php echo $row['id'];?>"><button type="button" class="btn btn-default">删除</button></a>
@@ -134,7 +134,7 @@ if (!$blogId) {
                     <br>
                     <div class="row">
                     <div class="col-md-4">
-                    <?php  echo $row['content']; ?>
+                    <?php  echo htmlspecialchars($row['content']); ?>
                     </div>
                     </div>
                     <div style="display:none" id="<?php echo $row['id'];?>">
@@ -166,7 +166,7 @@ if (!$blogId) {
                                             <div class="col-md-4">
                                             <button type="button" class="btn btn-default"  onclick="show_comment_form(<?php echo $row['id'] ?>)">回复</button>
                                             <?php
-                                            if ($_SESSION) {
+                                            if (isset($_SESSION['userEmail'])) {
                                             if ($_SESSION['userEmail'] == $row['email']): 
                                             ?>
                                             <a href="/Ourblog/deleteComment.php?blogId=<?php echo $blogId; ?>&commentId=<?php echo $row['id'];?>"><button type="button" class="btn btn-default">删除</button></a>
@@ -179,7 +179,7 @@ if (!$blogId) {
                                         <br>
                                         <div class="row">
                                         <div class="col-md-12">
-                                        <?php  echo $row['content']; ?>
+                                        <?php  echo htmlspecialchars($row['content']); ?>
                                         </div>
                                         </div>
                                         <div style="display:none" id="<?php echo $row['id'];?>">
@@ -211,7 +211,7 @@ if (!$blogId) {
                                                             </div>
                                                             <div class="col-md-4">
                                                             <?php
-                                                            if ($_SESSION) {
+                                                            if (isset($_SESSION['userEmail'])) {
                                                             if ($_SESSION['userEmail'] == $row['email']): 
                                                             ?>
                                                             <a href="/Ourblog/deleteComment.php?blogId=<?php echo $blogId; ?>&commentId=<?php echo $row['id'];?>"><button type="button" class="btn btn-default">删除</button></a>
@@ -224,7 +224,7 @@ if (!$blogId) {
                                                         <br>
                                                         <div class="row">
                                                         <div class="col-md-12">
-                                                        <?php  echo $row['content']; ?>
+                                                        <?php  echo htmlspecialchars($row['content']); ?>
                                                         </div>
                                                         </div>
                                                      </div>
