@@ -27,8 +27,7 @@ if ($_POST) {
             'idx_column_id' => $columnId,
             'title' => $_POST['title'],
             'content' => $_POST['content'],
-            'user_id' => $_SESSION['uid'],
-            'post_time' => date("Y-m-d H:i:s")
+            'user_id' => $_SESSION['uid']
                 ), array('id' => $blogId));
 
 
