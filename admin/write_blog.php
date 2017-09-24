@@ -39,7 +39,7 @@ if ($_POST) {
         // push blog id into user redis list
         $redis = new redis();
         $conn = $redis->connect('127.0.0.1', 6379);
-        $yearMonth = date('Y-n');
+        $yearMonth = date('Y-m');
         $userId = $_SESSION['uid'];
         
         // 判断timeLine是否有该年月
