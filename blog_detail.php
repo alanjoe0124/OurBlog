@@ -80,19 +80,19 @@ if (!$blogId) {
                         $tagNameStr .= '<a href="http://localhost/Ourblog/search.php?tag=' . $tagRow['tag_name'] . '"><button type="button" class="btn btn-primary">' . $tagRow['tag_name'] . '</button></a> ';
                     }
                     if (isset($blogId)) {
-                        $blogInfo = Mysql::getInstance()->selectRow("SELECT title, content, post_time, email FROM blog join user on user.id = blog.user_id WHERE blog.id = ?", array($blogId));
+                        $blogInfo = Mysql::getInstance()->selectRow("SELECT title, content, post_time, email, user.id as user_id FROM blog join user on user.id = blog.user_id WHERE blog.id = ?", array($blogId));
                     }
                     if ($tagNameStr != '') {
                         echo '<div class="col-md-12"><h2>'
                         . htmlspecialchars($blogInfo['title'])
-                        . '</h2>' . '<small>' . $blogInfo['email'] . ' / ' . $blogInfo['post_time'] . '</small><br><br><p>tags:'
+                        . '</h2>' . '<a href="/Ourblog/user.php?user='.$blogInfo['user_id'].'">' . $blogInfo['email'] . '</a> / ' . $blogInfo['post_time'] . '<br><br><p>tags:'
                         . $tagNameStr
                         . '</p></div><div class="col-md-12"><pre>'
                         . htmlspecialchars($blogInfo['content']) . '</pre></div>';
                     } else {
                         echo '<div class="col-md-12"><h2>'
                         . htmlspecialchars($blogInfo['title'])
-                        . '</h2>' . '<small>' . $blogInfo['email'] . ' / ' . $blogInfo['post_time'] . '</small><br><br>'
+                        . '</h2>' . '<a href="/Ourblog/user.php?user='.$blogInfo['user_id'].'">' . $blogInfo['email'] . ' </a>/ ' . $blogInfo['post_time'] . '<br><br>'
                         . '</div><div class="col-md-12"><pre>'
                         . htmlspecialchars($blogInfo['content']) . '</pre></div>';
                     }
