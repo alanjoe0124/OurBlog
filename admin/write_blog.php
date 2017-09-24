@@ -36,6 +36,19 @@ if ($_POST) {
                 }
             }
         }
+        // push blog id into user redis list
+        $redis = new redis();
+        $conn = $redis->connect('127.0.0.1', 6379);
+        $yearMonth = date('Y-n');
+        $userId = $_SESSION['uid'];
+        
+        // 判断timeLine是否有该年月
+        $timeLine = $redis->lRange("blogUser:$userId:timeLine", 0, -1);
+        if (!in_array($yearMonth, $timeLine)) {
+            $redis->rPush("blogUser:$userId:timeLine", $yearMonth);
+        }
+        //存入该年月的list中
+        $redis->rPush("blogUser:$userId:yearMonth:$yearMonth:blogs",$blogId);
     } catch (Exception $e) {
         Mysql::getInstance()->rollback();
     }
@@ -81,7 +94,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
             </div>
             <div class="form-group row">
                 <div class="col-md-4 col-md-offset-4">
-                <button type="submit">submit</button>
+                    <button type="submit">submit</button>
                 </div>
             </div>   
         </form>
