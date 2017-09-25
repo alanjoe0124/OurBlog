@@ -16,7 +16,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
         $uesrBlogs = Mysql::getInstance()->selectAll("select id, title, post_time from blog where user_id = ? order by post_time desc limit " . ($page->offset) . "," . ( $page->listRows), array($_SESSION['uid']));
         foreach ($uesrBlogs as $blogInfo) {
             echo '<div class="col-md-12 list">
-                                    <div class="col-md-4">
+                                    <div class="col-md-4 title">
                                         <a href="http://localhost/Ourblog/blog_detail.php?blog=' . $blogInfo['id'] . '">' . htmlspecialchars($blogInfo['title']) . '</a>
                                     </div>
                                     <div class="col-md-2 col-md-offset-3">

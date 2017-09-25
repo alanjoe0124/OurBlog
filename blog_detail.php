@@ -61,9 +61,9 @@ if (!$blogId) {
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/css/main.css">
-        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/css/bootstrap.min.css">
-        <link rel="stylesheet" type="text/css" href="http://localhost/Ourblog/common/bootstrap/font-awesome/css/font-awesome.min.css">
+        <link rel="stylesheet" type="text/css" href="/Ourblog/common/css/main.css">
+        <link rel="stylesheet" type="text/css" href="/Ourblog/common/bootstrap/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="/Ourblog/common/bootstrap/font-awesome/css/font-awesome.min.css">
     </head>
     <body>
         <div class="container">
@@ -77,7 +77,7 @@ if (!$blogId) {
                     $tagNameStr = '';
                     $tagRows = Mysql::getInstance()->selectAll("SELECT tag_name FROM blog_tag JOIN tag ON tag.id = blog_tag.tag_id WHERE blog_id = ?", array($blogId));
                     foreach ($tagRows as $tagRow) {
-                        $tagNameStr .= '<a href="http://localhost/Ourblog/search.php?tag=' . $tagRow['tag_name'] . '"><button type="button" class="btn btn-primary">' . $tagRow['tag_name'] . '</button></a> ';
+                        $tagNameStr .= '<a href="/Ourblog/search.php?tag=' . $tagRow['tag_name'] . '"><button type="button" class="btn btn-primary">' . $tagRow['tag_name'] . '</button></a> ';
                     }
                     if (isset($blogId)) {
                         $blogInfo = Mysql::getInstance()->selectRow("SELECT title, content, post_time, email, user.id as user_id FROM blog join user on user.id = blog.user_id WHERE blog.id = ?", array($blogId));
@@ -104,6 +104,27 @@ if (!$blogId) {
                 //   exit(var_dump($listComment->Rows()));
                 ?>
                 <div class="col-md-8 col-md-offset-2">
+                    <div class="row">
+                    <div class="col-md-4 col-md-offset-5">
+                        <button type="button" class="btn btn-primary like">赞: 
+                            <div id="like">
+                                <?php 
+                                    $redis= new Redis();
+                                    $conn = $redis->connect('127.0.0.1', 6379);
+                                    $likeNum = $redis->get("blog:".$blogId.":likeNum");
+                                    $likeNum = $likeNum ? $likeNum : 0;
+                                    echo $likeNum;
+                                ?>
+                            </div></button>&nbsp; &nbsp; 
+                            <button type="button" class="btn btn-primary dislike"> 踩: <div id="dislike">
+                                <?php
+                                    $dislikeNum = $redis->get("blog:".$blogId.":dislikeNum");
+                                    $dislikeNum = $dislikeNum ? $dislikeNum : 0;
+                                    echo $dislikeNum;
+                                ?>
+                                </div></button>
+                    </div>
+                    </div>
                     <HR width="100%"  style="height:1px;border:none;border-top:1px solid #555555;">
                     <h4>Comments</h4>
                     <?php
@@ -113,7 +134,7 @@ if (!$blogId) {
                      <HR width="100%">
                     <div class="row">
                         <div class="col-md-4">
-                        <?php  echo $row['email']; ?>
+                        <?php  echo '<a href="/Ourblog/user.php?user='.$row['user_id'].'">'.$row['email'].'</a>'; ?>
                         </div>
                         <div class="col-md-4">
                         <?php  echo $row['post_time']; ?>
@@ -158,7 +179,7 @@ if (!$blogId) {
                                     <div style="width: 85%;margin-left: 15%; float: right;text-align: left">
                                         <div class="row">
                                             <div class="col-md-4">
-                                            <?php  echo $row['email']; ?>
+                                            <?php  echo '<a href="/Ourblog/user.php?user='.$row['user_id'].'">'.$row['email'].'</a>'; ?>
                                             </div>
                                             <div class="col-md-4">
                                             <?php  echo $row['post_time']; ?>
@@ -204,7 +225,7 @@ if (!$blogId) {
                                                      <div style="width: 75%; margin-left: 25%; float: right;">
                                                         <div class="row">
                                                             <div class="col-md-4">
-                                                            <?php  echo $row['email']; ?>
+                                                            <?php  echo '<a href="/Ourblog/user.php?user='.$row['user_id'].'">'.$row['email'].'</a>'; ?>
                                                             </div>
                                                             <div class="col-md-4">
                                                             <?php  echo $row['post_time']; ?>
@@ -259,8 +280,8 @@ if (!$blogId) {
                 </div>
             </div>
         </div>
-        <script src="http://localhost/Ourblog/common/js/jquery-3.2.1.min.js"></script>
-        <script src="http://localhost/Ourblog/common/bootstrap/js/bootstrap.min.js"></script>
+        <script src="/Ourblog/common/js/jquery-3.2.1.min.js"></script>
+        <script src="/Ourblog/common/bootstrap/js/bootstrap.min.js"></script>
         <script>
         function show_comment_form( formId ) {
             $("#"+formId).show();
@@ -268,6 +289,65 @@ if (!$blogId) {
         function close_comment_form( formId ) {
             $("#"+formId).hide();
         }
+        $(document).ready(function(){
+            var likeFlag =0;
+            var likeRequestSent = false;
+            var dislikeFlag =0;
+            var dislikeRequestSent = false;
+            
+            $('.like').click(function(){
+                if ( ! $('#email').html() ) {
+                    likeFlag = 1;
+                    alert('login please!');
+                }
+                if ( likeFlag === 0 && !likeRequestSent ) {
+                    likeFlag = 1;   
+                    likeRequestSent = true;
+                    var postData = {
+                        blogId: <?php echo $blogId; ?>,
+                        evaluate: 'like',
+                        blogUserId: <?php echo $blogInfo['user_id'];?>
+                    };
+                    $.post('/Ourblog/blog_evaluate.php', postData, function (response) {
+                        dislikeFlag = 1;
+                        if (response.res =="您已经赞过了" || response.res =="您已经踩过了") {
+                            alert(response.res);
+                        } else {
+                            var likeNum = $('button #like').html();
+                            var newLikeNum = parseInt(likeNum) + 1;
+                            $('button #like').html(newLikeNum) ;
+                        }
+                    }, 'json');
+                }
+            });
+            
+
+            $('.dislike').click(function(){
+                if ( ! $('#email').html() ) {
+                    dislikeFlag = 1;
+                    alert('login please!');
+                }
+                if ( dislikeFlag === 0 && !dislikeRequestSent ) {
+                    dislikeFlag = 1;   
+                    dislikeRequestSent = true;
+                    var postData = {
+                        blogId: <?php echo $blogId; ?>,
+                        evaluate: 'dislike',
+                        blogUserId: <?php echo $blogInfo['user_id'];?>
+                    };
+                    $.post('/Ourblog/blog_evaluate.php', postData, function (response) {
+                        likeFlag =1;
+                        if (response.res =="您已经赞过了" || response.res =="您已经踩过了") {
+                            alert(response.res);
+                        } else {
+                            var dislikeNum = $('button #dislike').html();
+                            var newDislikeNum = parseInt(dislikeNum) + 1;
+                            $('button #dislike').html(newDislikeNum) ;
+                        }
+                    }, 'json');
+                }
+            });
+        });
         </script>
     </body>
 </html>

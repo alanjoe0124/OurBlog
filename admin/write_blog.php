@@ -53,7 +53,7 @@ if ($_POST) {
         Mysql::getInstance()->rollback();
     }
     Mysql::getInstance()->commit();
-    header("Location:http://localhost/Ourblog/admin/write_blog.php");
+    header("Location:/Ourblog/admin/write_blog.php");
     exit;
 }
 require_once __DIR__ . '/../common/front/admin_common.php';

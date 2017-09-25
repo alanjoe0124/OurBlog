@@ -3,7 +3,7 @@
 class ListComment {
 
     public function Rows() {
-        $commentRows = Mysql::getInstance()->query( 'SELECT comment.id as id, content, post_time, email 
+        $commentRows = Mysql::getInstance()->query( 'SELECT comment.id as id, content, post_time, email, user_id 
                  FROM comment 
                  JOIN user ON user.id = comment.user_id 
                  WHERE parent_id = 0 and comment_blog_id = '.$_GET['blog'] );
@@ -13,13 +13,14 @@ class ListComment {
                 $data[$commentRow['id']]['content']=$commentRow['content'];
                 $data[$commentRow['id']]['post_time'] = $commentRow['post_time'];
                 $data[$commentRow['id']]['email'] = $commentRow['email'];
+                $data[$commentRow['id']]['user_id'] = $commentRow['user_id'];
                 $data[$commentRow['id']]['child'] = $this->subRows($commentRow["id"]); 
         }
         return $data;
     }
     
     public function subRows($cate_id) {
-        $commentRows = Mysql::getInstance()->query( 'SELECT comment.id as id, content, post_time, email 
+        $commentRows = Mysql::getInstance()->query( 'SELECT comment.id as id, content, post_time, email, user_id 
                  FROM comment 
                  JOIN user ON user.id = comment.user_id 
                  WHERE parent_id = '.$cate_id.' and comment_blog_id = '.$_GET['blog'] );
@@ -29,6 +30,7 @@ class ListComment {
                 $data[$commentRow['id']]['content']=$commentRow['content'];
                 $data[$commentRow['id']]['post_time'] = $commentRow['post_time'];
                 $data[$commentRow['id']]['email'] = $commentRow['email'];
+                $data[$commentRow['id']]['user_id'] = $commentRow['user_id'];
                 $data[$commentRow['id']]['child'] = $this->subRows($commentRow["id"]); 
         }
         return $data;

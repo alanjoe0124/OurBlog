@@ -27,6 +27,6 @@ if (!$columnId) {
     throw new InvalidArgumentException("Invalid column");
 }
 $titleLength = mb_strlen($_POST['title'], 'utf-8');
-if ($titleLength > 100 || $titleLength < 1) {
-    throw new InvalidArgumentException('Title maxLength 100 , minLength 1');
+if ($titleLength > 40 || $titleLength < 1) {
+    throw new InvalidArgumentException('Title maxLength 40 , minLength 1');
 }

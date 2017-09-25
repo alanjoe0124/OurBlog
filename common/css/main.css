@@ -6,3 +6,7 @@ a{text-decoration:none;}
 #email{display:inline}
 .page {text-align: center;}
 HR{float: right}
+
+.title {text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;}
+.rankTitle{width:120px; float:left;display:inline;}
+.likeNum{width:40px;float:left;display:inline;}

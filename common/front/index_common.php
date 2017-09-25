@@ -7,14 +7,14 @@ if (!isset($permission)) {
 <div class="row">
     <div class="col-md-12">
         <div class="col-md-8 col-md-offset-2">
-            <p><h3><a href="http://localhost/Ourblog/index.php">OurBlog</a></h3>
+            <p><h3><a href="/Ourblog/index.php">OurBlog</a></h3>
             <?php
             session_start();
             if (!isset($_SESSION['uid'])) {
-                echo '&nbsp;<h4><a href="http://localhost/Ourblog/admin/login.php">login</a></h4>
-        |<h4><a href="http://localhost/Ourblog/admin/register.php">register</a></h4>';
+                echo '&nbsp;<h4><a href="/Ourblog/admin/login.php">login</a></h4>
+        |<h4><a href="/Ourblog/admin/register.php">register</a></h4>';
             } else {
-                echo '&nbsp;&nbsp;<h3><a href="http://localhost/Ourblog/admin/blog_manage.php">admin</a></h3>';
+                echo '&nbsp;&nbsp;<h3><a href="/Ourblog/admin/blog_manage.php">admin</a></h3>';
             }
             $columns = array();
             $columnRows = Mysql::getInstance()->selectAll("SELECT * FROM index_column");
@@ -22,11 +22,20 @@ if (!isset($permission)) {
                 $columns[$columnRow["id"]] = $columnRow["name"];
             }
             foreach ($columns as $key => $value) {
-                echo '&nbsp;&nbsp;&nbsp;<h4><a href="http://localhost/Ourblog/index.php?col=' . $key . '">' . $value . '</a></h4>';
+                echo '&nbsp;&nbsp;&nbsp;<h4><a href="/Ourblog/index.php?col=' . $key . '">' . $value . '</a></h4>';
             }
             ?>
         </p>
         </div>
+        <?php 
+        if (isset($_SESSION['uid'])):
+        ?>
+                <div class="col-md-2">
+                    <h4><div id="email"><a href="/Ourblog/user.php?user=<?php echo $_SESSION['uid'];?>"><?php echo $_SESSION['userEmail']; ?></a></div> | <a href="/Ourblog/admin/logout.php">logout</a></h4>
+                </div>
+        <?php
+        endif;
+        ?>
     </div>
 </div>
 
