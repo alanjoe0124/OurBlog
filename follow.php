@@ -65,18 +65,12 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                     <div class="col-md-8  col-md-offset-2">
                         <div class="col-md-12">
                             <div class="col-md-8">
-                                <h2><?php echo $userRow['email']; ?>的动态</h2>
+                                <h2><?php echo $userRow['email']; ?>的关注</h2>
                             </div>
                             <?php
                             $redis = new Redis();
                             $conn = $redis->connect('127.0.0.1', 6379);
                             ?>
-                            <div class="col-md-4" style="padding-top: 30">
-                                <h4>
-                                    <a href="/Ourblog/follow.php?user=<?php echo $userId; ?>">关注</a><?php echo $redis->get("blogUser:$userId:followingNum") ? $redis->get("blogUser:$userId:followingNum") : 0; ?> / 
-                                    <a href="/Ourblog/fans.php?user=<?php echo $userId; ?>">粉丝</a><?php echo $redis->get("blogUser:$userId:fansNum") ? $redis->get("blogUser:$userId:fansNum") : 0; ?>
-                                </h4>
-                            </div>
                         </div>
                         <div class="col-md-12">
                             <?php
@@ -98,35 +92,17 @@ require_once __DIR__ . '/ClassLib/AutoLoad.php';
                 </div>
                 <div class="row">
                     <div class="col-md-2">
-                        <?php echo $userRow['email']; ?>的好评文章<br><br>
-                        <?php
-                        $userBlogRank = $redis->zRevRange("blogUser:$userId:blogRank", 0, 10, true);
-                        if ($userBlogRank) {
-                            foreach ($userBlogRank as $blogInfo => $like) {
-                                $blogInfoArr = explode(':', $blogInfo);
-                                echo "<div><div class=\"title rankTitle\"><a href=\"/Ourblog/blog_detail.php?blog=" . $blogInfoArr[0] . "\">" . $blogInfoArr[1] . "</a></div><div class=\"likeNum\">" . $like . " 赞</div></div><br><br>";
-                            }
-                        }
-                        ?>
                     </div>
                     <div class="col-md-8">
                         <div class="col-md-12">
                             <?php
-                            $timeLine = $redis->lRange("blogUser:$userId:timeLine", 0, -1);
-                            echo "<h3>时间线</h3><br>================================================<br><br>";
-                            foreach ($timeLine as $yearMonth) {
-                                echo "<h4>$yearMonth</h4><br><br><br>";
-                                $blogs = $redis->lRange("blogUser:$userId:yearMonth:$yearMonth:blogs", 0, -1);
-                                $blogIds = implode(', ', $blogs);
-                                $blogRows = Mysql::getInstance()->selectAll("SELECT  id,title,post_time FROM blog where Id in ($blogIds)");
-                                foreach ($blogRows as $blogRow) {
-                                    $likeNum = $redis->get("blog:" . $blogRow['id'] . ":likeNum");
-                                    $likeNum = $likeNum ? $likeNum : 0;
-                                    $dislikeNum = $redis->get("blog:" . $blogRow['id'] . ":dislikeNum");
-                                    $dislikeNum = $dislikeNum ? $dislikeNum : 0;
-                                    echo '<div class="col-md-12 list" onclick="window.location.href=\'/Ourblog/blog_detail.php?blog=' . $blogRow['id'] . '\'">
-                                       <div class="col-md-5 title"><a href="javascript:void(0)">' . htmlspecialchars($blogRow['title']) . '</a></div><div class="col-md-4">' .
-                                    '赞:' . $likeNum . '/踩:' . $dislikeNum . '</div><div class="col-md-3">' . $blogRow['post_time'] . '</div></div><br><br><br>';
+                            $follow = $redis->sMembers("blogUser:$userId:following");
+                            if (!empty($follow)) {
+                                $userIds = implode(',', $follow);
+                                $stmt = Mysql::getInstance()->query("SELECT id, email FROM user WHERE id in ($userIds)");
+
+                                foreach ($stmt as $userRow) {
+                                    echo '<a href="/Ourblog/user.php?user=' . $userRow['id'] . '">' . $userRow['email'] . '</a><br>';
                                 }
                             }
                             ?>
