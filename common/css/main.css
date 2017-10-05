@@ -2,7 +2,7 @@ h3{display: inline;}
 h5{display: inline;}
 h4{display: inline;}
 a{text-decoration:none;}
-.list:hover{  background-color: #EBEBEB}
+.list:hover{  background-color: FFFFFF}
 #email{display:inline}
 .page {text-align: center;}
 HR{float: right}
@@ -10,3 +10,4 @@ HR{float: right}
 .title {text-overflow: ellipsis;overflow: hidden;display: inline-block;white-space: nowrap;}
 .rankTitle{width:120px; float:left;display:inline;}
 .likeNum{width:40px;float:left;display:inline;}
+body{background:url(../blog.gif); }
