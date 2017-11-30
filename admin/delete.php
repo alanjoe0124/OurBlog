@@ -20,7 +20,7 @@ try {
 } catch (InvalidArgumentException $e) {
     exit('INVALID PARAM');
 }
-$data = Mysql::getInstance()->selectRow("SELECT id, post_time,idx_column_id FROM blog WHERE id = ? AND user_id = ?", array($blogId, $_SESSION['uid']));
+$data = Mysql::getInstance()->selectRow("SELECT id, post_time,idx_column_id,title FROM blog WHERE id = ? AND user_id = ?", array($blogId, $_SESSION['uid']));
 if (!$data) {
     exit("sorry, permission denied");
 }
@@ -39,8 +39,8 @@ if ($redis->exists("blog:" . $blogId . ":dislikeNum")) {
     $redis->delete("blog:" . $blogId . ":dislikeNum");
 }
 
-$redis->zDelete("blogUser:$userId:blogRank",$blogId);
-$redis->zDelete("blogCategory:" . $data['idx_column_id'] . ":blogRank", $blogId);
+$redis->zRem("blogUser:$userId:blogRank",$blogId.':'.$data['title']);
+$redis->zRem("blogCategory:" . $data['idx_column_id'] . ":blogRank", $blogId.':'.$data['title']);
 
 $postTime = explode('-', $data['post_time']);
 $yearMonth = $postTime['0'] . '-' . $postTime['1'];

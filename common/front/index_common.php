@@ -62,5 +62,6 @@ if (!isset($permission)) {
                     </form>
                     <HR width="100%">
                 </div>
+                <a href="/Ourblog/search">sphinx search</a>
             </div>
 

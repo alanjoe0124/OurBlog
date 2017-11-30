@@ -33,12 +33,11 @@ require_once __DIR__ . '/common/front/index_common.php';
         if (!$col) {
             $page->totalPages = ceil(Mysql::getInstance()->count("select count(*) from blog") / $page->listRows);
 
-            $listBlogs = Mysql::getInstance()->selectAll("select blog.id as id, title, post_time, email from blog join user on user.id = blog.user_id order by post_time desc limit " . ($page->offset) . "," . ($page->listRows));
+            $listBlogs = Mysql::getInstance()->selectAll("select blog.id as id, title, post_time, email from blog join (select id from blog order by post_time desc limit " . ($page->offset) . "," . ($page->listRows).") as lim using (id)  join user on user.id = blog.user_id");
         } else {
             $page->totalPages = ceil(Mysql::getInstance()->count("select count(*) from blog where idx_column_id = " . $col) / $page->listRows);
             $listBlogs = Mysql::getInstance()
-                    ->selectAll("select blog.id as id, title, post_time, email from blog join user on user.id = blog.user_id  where idx_column_id = ? order by post_time desc limit " .
-                    ($page->offset) . "," . ( $page->listRows), array($col));
+->selectAll("select blog.id as id, title, post_time, email from blog  join (select id from blog  where idx_column_id = ? order by post_time desc limit " .($page->offset) . "," . ($page->listRows) . ") as lim using (id) join user on user.id=blog.user_id", array($col));
         }
         if ($listBlogs) {
             echo '<div class="col-md-8">';

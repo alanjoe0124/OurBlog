@@ -13,7 +13,7 @@ require_once __DIR__ . '/../common/front/admin_common.php';
         <?php
         $page = new Page(10);
         $page->totalPages = ceil(Mysql::getInstance()->count("select count(*) from blog where user_id = " . $_SESSION['uid']) / $page->listRows);
-        $uesrBlogs = Mysql::getInstance()->selectAll("select id, title, post_time from blog where user_id = ? order by post_time desc limit " . ($page->offset) . "," . ( $page->listRows), array($_SESSION['uid']));
+        $uesrBlogs = Mysql::getInstance()->selectAll("select id, title, post_time from blog  join (select id from blog where user_id = ? order by post_time desc limit " . ($page->offset) . "," . ( $page->listRows). ') as lim using (id)', array($_SESSION['uid']));
         foreach ($uesrBlogs as $blogInfo) {
             echo '<div class="col-md-12 list">
                                     <div class="col-md-4 title">
